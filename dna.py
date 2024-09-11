@@ -4,7 +4,10 @@ DNA
 
 
 def longest_subsequence(string_1, string_2):
-    
+    sequence_1 = string_1.split()
+    sequence_2 = string_2.split()
+    print(sequence_1)
+    print(sequence_2)
 
 
 
@@ -16,13 +19,18 @@ def main():
     """
 
     # read the data
+    input_file = open("dna.in")
     # number of lines
-    n_lines = int(input())
+    # n_lines = int(input())
+    n_lines = int(input_file.readline())
+    print(n_lines)
 
     # for each pair
     for _ in range(0, n_lines):
-        str_1 = input()
-        str_2 = input()
+        # str_1 = input()
+        # str_2 = input()
+        str_1 = input_file.readline()
+        str_2 = input_file.readline()
 
         # call longest_subsequence
         subsequences = longest_subsequence(str_1, str_2)
