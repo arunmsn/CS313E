@@ -4,7 +4,7 @@ DNA
 
 
 def longest_subsequence(string_1, string_2):
-    """ADD YOUR CODE HERE """
+    
 
 
 
