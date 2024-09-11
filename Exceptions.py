@@ -9,10 +9,12 @@ def is_float(val):
         return False
     finally:
         print('all inputs are processed')
-        
+
 def zero_div(val):
+    """Tries to divide by 0 handling the ZeroDivisionError exception"""
     try:
         out = int(val) / 0
+        print(out)
     except ZeroDivisionError as d:
         print(d)
 
