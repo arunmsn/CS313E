@@ -2,8 +2,8 @@
 #  Description:
 #  Student Name: Arun Mahadevan Sathia Narayanan
 #  Student UT EID: as235872
-#  Partner Name:
-#  Partner UT EID:
+#  Partner Name: Pranav Belligundu
+#  Partner UT EID: psb898
 #  Course Name: CS 313E
 #  Unique Number: 50184
 #  Date Created: 09/12/2024
@@ -136,8 +136,9 @@ def sum_sub_grid(grid, val):
 
     return total
 
+""""
+main with input through terminal
 def main():
-    """Main function"""
     while True:
         try:
             input1 = input()
@@ -153,5 +154,39 @@ def main():
             print(adj_sum)
         except ValueError:
             continue
+"""
 
+def main():
+
+    #takes input from the spiral-1.in input file
+    input_stream = sys.stdin
+    lines = input_stream.read().strip().split()
+    
+    current_line = 0
+    
+    while current_line < len(lines):
+        try:
+            dim = int(lines[current_line])
+            current_line += 1
+            
+            #fib spiral
+            grid = create_spiral(dim)
+            print_grid(grid)
+            
+            while current_line < len(lines) and lines[current_line].isdigit():
+                sum_val = int(lines[current_line])
+                current_line += 1
+                
+                #sum of 3x3 subgrid around the found value
+                adj_sum = sum_sub_grid(grid, sum_val)
+                print(adj_sum)
+        
+        except ValueError:
+            #if the input is not a number
+            print('String Invalid Input')
+            current_line += 1
+    
 main()
+
+
+
