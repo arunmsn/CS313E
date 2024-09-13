@@ -9,7 +9,7 @@
 #  Date Created: 09/12/2024
 #  Date Last Modified:
 
-import math
+# import math
 import sys
 
 #THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
@@ -123,8 +123,8 @@ def sum_sub_grid(grid, val):
             if grid[i][j] == 0:
                 return -1
             elif grid[i][j] == val:
-                base_row = i
-                base_col = j
+                i = base_row
+                j = base_col
 
     total = 0
     for i in range(-1, 2):
@@ -136,9 +136,9 @@ def sum_sub_grid(grid, val):
 
     return total
 
-""""
-main with input through terminal
+
 def main():
+    """main with input through terminal"""
     while True:
         try:
             input1 = input()
@@ -148,45 +148,42 @@ def main():
             input2 = input()
             if input2 != "":
                 sum_val = int(input2)
-
             adj_sum = sum_sub_grid(grid, sum_val)
-
             print(adj_sum)
+            input3 = input()
+            if input3 == "":
+                break
         except ValueError:
             continue
+
 """
-
 def main():
-
     #takes input from the spiral-1.in input file
     input_stream = sys.stdin
     lines = input_stream.read().strip().split()
-    
+
     current_line = 0
-    
+
     while current_line < len(lines):
         try:
             dim = int(lines[current_line])
             current_line += 1
-            
+
             #fib spiral
             grid = create_spiral(dim)
             print_grid(grid)
-            
-            while current_line < len(lines) and lines[current_line].isdigit():
+
+            if lines[current_line].isdigit():
                 sum_val = int(lines[current_line])
                 current_line += 1
-                
+
                 #sum of 3x3 subgrid around the found value
                 adj_sum = sum_sub_grid(grid, sum_val)
                 print(adj_sum)
-        
+
         except ValueError:
             #if the input is not a number
             print('String Invalid Input')
             current_line += 1
-    
+"""
 main()
-
-
-
