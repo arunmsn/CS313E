@@ -29,15 +29,19 @@ def print_grid(grid):
     printed_grid = create_blank_grid(len(grid), len(grid[0]))
 
     max_length = [-1] * len(grid)
-    for j in enumerate(grid[0]):
-        for i in enumerate(grid):
+    length_grid0 = len(grid[0])
+    length_grid = len(grid)
+    for j in range(length_grid0):
+        for i in range(length_grid):
             printed_grid[i][j] = str(grid[i][j]) + " "
             if len(printed_grid[i][j]) > max_length[j]:
                 max_length[j] = len(printed_grid[i][j])
 
-    for i in enumerate(printed_grid):
+    len_printed_grid = len(printed_grid)
+    len_printed_grid0 = len(printed_grid[0])
+    for i in range(len_printed_grid):
         row = ""
-        for j in enumerate(printed_grid[0]):
+        for j in range(len_printed_grid0):
             row += (printed_grid[i][j] + " " * (max_length[j] - len(printed_grid[i][j]) + 1))
         print(row)
 
@@ -112,14 +116,15 @@ def sum_sub_grid(grid, val):
     """Sums the sub grid"""
     base_row = -2
     base_col = -2
-    for i in enumerate(grid):
-        for j in enumerate(grid[0]):
+    len_grid = len(grid)
+    len_grid0 = len(grid[0])
+    for i in range(len_grid):
+        for j in range(len_grid0):
             if grid[i][j] == 0:
                 return -1
             elif grid[i][j] == val:
                 base_row = i
                 base_col = j
-
 
     total = 0
     for i in range(-1, 2):
@@ -134,12 +139,19 @@ def sum_sub_grid(grid, val):
 def main():
     """Main function"""
     while True:
-        dim = int(input())
-        grid = create_spiral(dim)
-        sum_val = int(input())
+        try:
+            input1 = input()
+            if input1 != "":
+                dim = int(input1)
+                grid = create_spiral(dim)
+            input2 = input()
+            if input2 != "":
+                sum_val = int(input2)
 
-        adj_sum = sum_sub_grid(grid, sum_val)
+            adj_sum = sum_sub_grid(grid, sum_val)
 
-        print(adj_sum)
+            print(adj_sum)
+        except ValueError:
+            continue
 
 main()
