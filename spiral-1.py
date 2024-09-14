@@ -79,60 +79,85 @@ def create_spiral(dim):
 
     curDir = 0
 
-
+    #moved this here
+    multiplicity = 1
+    
     for i in range(dim ** 2):
-        multiplicity = 1
+        grid[curRow][curCol] = onePrev #added
+        # multiplicity = 1
         attemptedRow = curRow + directions[curDir][0]
         attemptedCol = curCol + directions[curDir][1]
+
+        if not check_valid_space(attemptedRow, attemptedCol, grid): #added this instead of an else
+            #curDir =  curDir + 1
+            curDir = (curDir + 1) % 4
+
+            attemptedRow = curRow + directions[curDir][0]
+            attemptedCol = curCol + directions[curDir][1]
+
+            #curRow += directions[curDir][0]
+            #curCol += directions[curDir][1]
+            # grid[curRow][curCol] = find_fib_number(onePrev, twoPrev, multiplicity) remove
 
         if check_valid_space(attemptedRow, attemptedCol, grid):
             curRow = attemptedRow
             curCol = attemptedCol
         else:
-            curDir =  curDir + 1
-            curRow += directions[curDir][0]
-            curCol += directions[curDir][1]
-            grid[curRow][curCol] = find_fib_number(onePrev, twoPrev, multiplicity)
+            break
+        
+        #moved here
+        nextFib = find_fib_number(onePrev, twoPrev, multiplicity) 
 
-        if grid[curRow][curCol] >= onePrev:
+    
+        if nextFib < 0:
+            nextFib = -nextFib  # If negative, convert it to positive, as per your error correction logic in find_fib_number
+            onePrev = nextFib
+            twoPrev = 0  # Reset the Fibonacci sequence with the multiplicity
+            multiplicity += 1  # Increment multiplicity since we hit the limit and reset
+        else:
             twoPrev = onePrev
-            onePrev = grid[curRow][curCol]
+            onePrev = nextFib  # Normal Fibonacci sequence update
+
+        """
+        if nextFib > 0:
+            twoPrev = onePrev
+            onePrev = nextFib
         elif grid[curRow][curCol] == 0:
             break
         else:
             #we are flipping back the signal we set earlier to correct it
-            grid[curRow][curCol] *= -1
+            nextFib = nextFib * -1
             multiplicity += 1
-            onePrev = 0
-            twoPrev = multiplicity
-        
+            onePrev = nextFib
+            twoPrev = 0
+        """
     print_grid(grid)
 
     return grid
 
 def sum_sub_grid(grid, val):
-    """Sums the sub grid"""
-    base_row = -2
-    base_col = -2
-    len_grid = len(grid)
-    len_grid0 = len(grid[0])
-    for i in range(len_grid):
-        for j in range(len_grid0):
+    """Sums the subgrid"""
+    baseRow = -2
+    baseCol = -2
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
             if grid[i][j] == 0:
-                return -1
+                return (-1)
             elif grid[i][j] == val:
-                i = base_row
-                j = base_col
+                baseRow = i
+                baseCol = j
+    
 
-    total = 0
+    sum = 0
+
     for i in range(-1, 2):
         for j in range(-1, 2):
-            new_row = i
-            new_col = j
-            if new_row >= 0 and new_row < len(grid) and new_col >= 0 and new_col < len(grid[0]):
-                total += grid[new_row][new_col]
-
-    return total
+            newRow = i
+            newCol = j
+            if newRow >= 0 and newRow < len(grid) and newCol >= 0 and newCol < len(grid[0]):
+                sum += grid[newRow][newCol]
+    
+    return sum
 
 
 def main():
