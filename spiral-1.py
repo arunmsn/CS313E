@@ -48,7 +48,7 @@ def find_fib_number(onePrev, twoPrev, multiplicity):
 
     if fib_number > LIMIT:
         fib_number = multiplicity
-        return fib_number * -1
+        return fib_number * -1 #changed
     return fib_number
 
 def check_valid_space(row, col, grid):
@@ -110,13 +110,13 @@ def create_spiral(dim):
 
     
         if nextFib < 0:
-            nextFib = -nextFib  # If negative, convert it to positive, as per your error correction logic in find_fib_number
+            nextFib = -nextFib  
             onePrev = nextFib
-            twoPrev = 0  # Reset the Fibonacci sequence with the multiplicity
-            multiplicity += 1  # Increment multiplicity since we hit the limit and reset
+            twoPrev = 0  
+            multiplicity += 1  
         else:
             twoPrev = onePrev
-            onePrev = nextFib  # Normal Fibonacci sequence update
+            onePrev = nextFib  
 
         """
         if nextFib > 0:
