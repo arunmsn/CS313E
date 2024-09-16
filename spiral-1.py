@@ -9,8 +9,6 @@
 #  Date Created: 09/12/2024
 #  Date Last Modified:
 
-import sys
-
 #THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
 def create_blank_grid(length, width):
     grid = []
@@ -18,21 +16,17 @@ def create_blank_grid(length, width):
         grid.append([])
         for j in range(width):
             grid[i].append(0)
-    
     return grid
 
 #THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
 def print_grid(grid):
     printed_grid = create_blank_grid(len(grid), len(grid[0]))
-    
     maxLength = [-1] * len(grid);
-
     for j in range (len(grid[0])):
         for i in range (len(grid)):
             printed_grid[i][j] = (str(grid[i][j]) + " ")
             if len(printed_grid[i][j]) > maxLength[j]:
                 maxLength[j] = len(printed_grid[i][j])
-         
     for i in range (len(printed_grid)):
         row = ""
         for j in range (len(printed_grid[0])): 
@@ -127,13 +121,9 @@ def main():
     while True:
         try:
             dim = int(input())
-            
             grid = create_spiral(dim)
-            
             sum_val = int(input())
-            
             adj_sum = sum_sub_grid(grid, sum_val)
-            
             print(adj_sum)
 
         except ValueError:
@@ -143,6 +133,3 @@ def main():
             break
 
 main()
-
-
-

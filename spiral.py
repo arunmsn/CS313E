@@ -74,7 +74,7 @@ def create_spiral(dim):
             fib_number = reset_start
             two_prev = 0
             one_prev = reset_start  # Reset sequence
-            if reset_start < 100:
+            if reset_start < 99:
                 reset_start += 1  # Increment reset start for next time
             else:
                 reset_start = 1
@@ -139,6 +139,7 @@ def main():
             print(adj_sum)
 
         except ValueError:
+            print("String Invalid Input")
             continue
         except EOFError:
             break
