@@ -22,6 +22,7 @@ def create_blank_grid(length, width):
 def print_grid(grid):
     printed_grid = create_blank_grid(len(grid), len(grid[0]))
     maxLength = [-1] * len(grid);
+
     for j in range (len(grid[0])):
         for i in range (len(grid)):
             printed_grid[i][j] = (str(grid[i][j]) + " ")
@@ -120,11 +121,21 @@ def main():
     """ main method """
     while True:
         try:
+            
             dim = int(input())
-            grid = create_spiral(dim)
-            sum_val = int(input())
-            adj_sum = sum_sub_grid(grid, sum_val)
-            print(adj_sum)
+            
+            if (dim < 20):
+
+                grid = create_spiral(dim)
+                
+                sum_val = int(input())
+                
+                adj_sum = sum_sub_grid(grid, sum_val)
+            
+                print(adj_sum)
+
+            else:
+                print('-1')
 
         except ValueError:
             print("String Invalid Input")
