@@ -139,7 +139,6 @@ def main():
             print(adj_sum)
 
         except ValueError:
-            print("String Invalid Input")
             continue
         except EOFError:
             break
