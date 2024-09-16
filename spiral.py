@@ -74,7 +74,10 @@ def create_spiral(dim):
             fib_number = reset_start
             two_prev = 0
             one_prev = reset_start  # Reset sequence
-            reset_start += 1  # Increment reset start for next time
+            if reset_start < 100:
+                reset_start += 1  # Increment reset start for next time
+            else:
+                reset_start = 1
         else:
             two_prev, one_prev = one_prev, fib_number  # Continue Fibonacci sequence
 
