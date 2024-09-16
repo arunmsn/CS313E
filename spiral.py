@@ -9,9 +9,6 @@
 #  Date Created: 09/12/2024
 #  Date Last Modified:
 
-# import math
-import sys
-
 #THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
 def create_blank_grid(length, width):
     """HELPER METHOD"""
@@ -129,19 +126,19 @@ def sum_sub_grid(grid, val):
     return total
 
 def main():
-    """main with input through terminal"""
+    """ main method """
     while True:
         try:
-            input1 = sys.stdin.readline()
-            if input1 != "":
-                dim = int(input1)
-                grid = create_spiral(dim)
-            input2 = sys.stdin.readline()
-            if input2 != "":
-                sum_val = int(input2)
+            dim = int(input())
+            grid = create_spiral(dim)
+            sum_val = int(input())
             adj_sum = sum_sub_grid(grid, sum_val)
             print(adj_sum)
+
         except ValueError:
+            print("String Invalid Input")
             continue
+        except EOFError:
+            break
 
 main()
