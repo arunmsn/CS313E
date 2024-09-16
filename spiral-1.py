@@ -45,145 +45,103 @@ def print_grid(grid):
             row += (printed_grid[i][j] + " " * (max_length[j] - len(printed_grid[i][j]) + 1))
         print(row)
 
-
-def find_fib_number(one_prev, two_prev, multiplicity):
-    """Finds the Fibonacci number"""
-    limit = 100
-    fib_number = one_prev + two_prev
-
-    if fib_number > limit:
-        fib_number = multiplicity
-        fib_number *= -1
-    return fib_number
-
 def check_valid_space(row, col, grid):
     """Checks the valid space"""  
     length = len(grid)
     if row < 0 or row > length or col < 0 or col > length:
         return False
-    return grid[row][col] == 0
+    return True
+
+def find_fib_number(two_prev, one_prev):
+    """Finds the next Fibonacci number"""
+    return two_prev + one_prev
 
 def create_spiral(dim):
     """Create Spiral"""
-    # create variable to store our spiral numbers
     grid = create_blank_grid(dim, dim)
-
-    directions = [
-        [0, 1],
-        [1, 0],
-        [0, -1],
-        [-1, 0]
-    ]
-
+    directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]  # right, down, left, up
     cur_row = 0
     cur_col = 0
-    two_prev = 0
-    one_prev = 1
+    two_prev = 1
+    one_prev = 1  # Start with 1, 1
     cur_dir = 0
+    reset_start = 2  # The number to start with after reset
 
-
-    for _ in range(dim ** 2):
-        multiplicity = 1
-        attempted_row = cur_row + directions[cur_dir][0]
-        attempted_col = cur_col + directions[cur_dir][1]
-
-        if check_valid_space(attempted_row, attempted_col, grid):
-            cur_row = attempted_row
-            cur_col = attempted_col
+    for i in range(dim ** 2):
+        if i == 0 or i == 1:
+            fib_number = 1  # First two numbers are 1
         else:
-            cur_dir =  cur_dir + 1
-            cur_row += directions[cur_dir][0]
-            cur_col += directions[cur_dir][1]
-            grid[cur_row][cur_col] = find_fib_number(one_prev, two_prev, multiplicity)
+            fib_number = find_fib_number(two_prev, one_prev)
 
-        if grid[cur_row][cur_col] >= one_prev:
-            two_prev = one_prev
-            one_prev = grid[cur_row][cur_col]
-        elif grid[cur_row][cur_col] == 0:
+        if fib_number > 100:
+            fib_number = reset_start
+            two_prev = 0
+            one_prev = reset_start  # Reset sequence
+            reset_start += 1  # Increment reset start for next time
+        else:
+            two_prev, one_prev = one_prev, fib_number  # Continue Fibonacci sequence
+
+        grid[cur_row][cur_col] = fib_number
+
+        # Find next valid position
+        for _ in range(4):  # Try all directions
+            attempted_row = cur_row + directions[cur_dir][0]
+            attempted_col = cur_col + directions[cur_dir][1]
+            if (0 <= attempted_row < dim and
+                0 <= attempted_col < dim and 
+                grid[attempted_row][attempted_col] == 0):
+                cur_row = attempted_row
+                cur_col = attempted_col
+                break
+            cur_dir = (cur_dir + 1) % 4  # Change direction if current is invalid
+        else:  # If we've tried all directions and found no valid move
             break
-        else:
-            #we are flipping back the signal we set earlier to correct it
-            grid[cur_row][cur_col] *= -1
-            multiplicity += 1
-            one_prev = 0
-            two_prev = multiplicity
 
     print_grid(grid)
-
     return grid
 
 def sum_sub_grid(grid, val):
-    """Sums the sub grid"""
-    base_row = -2
-    base_col = -2
-    len_grid = len(grid)
-    len_grid0 = len(grid[0])
-    for i in range(len_grid):
-        for j in range(len_grid0):
-            if grid[i][j] == 0:
-                return -1
-            elif grid[i][j] == val:
-                i = base_row
-                j = base_col
+    """Sums the 3x3 sub grid centered on the given value"""
+    dim = len(grid)
+
+    # Find the position of the given value
+    center_row = -1
+    center_col = -1
+    for i in range(dim):
+        for j in range(dim):
+            if grid[i][j] == val:
+                center_row = i
+                center_col = j
+                break
+        if center_row != -1:
+            break
+
+    # If the value is not found, return -1
+    if center_row == -1:
+        return -1
 
     total = 0
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            new_row = i
-            new_col = j
-            if new_row >= 0 and new_row < len(grid) and new_col >= 0 and new_col < len(grid[0]):
-                total += grid[new_row][new_col]
+    for i in range(center_row - 1, center_row + 2):
+        for j in range(center_col - 1, center_col + 2):
+            if 0 <= i < dim and 0 <= j < dim:
+                total += grid[i][j]
 
     return total
-
 
 def main():
     """main with input through terminal"""
     while True:
         try:
-            input1 = input()
+            input1 = sys.stdin.readline()
             if input1 != "":
                 dim = int(input1)
                 grid = create_spiral(dim)
-            input2 = input()
+            input2 = sys.stdin.readline()
             if input2 != "":
                 sum_val = int(input2)
             adj_sum = sum_sub_grid(grid, sum_val)
             print(adj_sum)
-            input3 = input()
-            if input3 == "":
-                break
         except ValueError:
             continue
 
-"""
-def main():
-    #takes input from the spiral-1.in input file
-    input_stream = sys.stdin
-    lines = input_stream.read().strip().split()
-
-    current_line = 0
-
-    while current_line < len(lines):
-        try:
-            dim = int(lines[current_line])
-            current_line += 1
-
-            #fib spiral
-            grid = create_spiral(dim)
-            print_grid(grid)
-
-            if lines[current_line].isdigit():
-                sum_val = int(lines[current_line])
-                current_line += 1
-
-                #sum of 3x3 subgrid around the found value
-                adj_sum = sum_sub_grid(grid, sum_val)
-                print(adj_sum)
-
-        except ValueError:
-            #if the input is not a number
-            print('String Invalid Input')
-            current_line += 1
-"""
 main()
