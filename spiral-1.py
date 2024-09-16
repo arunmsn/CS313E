@@ -88,7 +88,7 @@ def create_spiral(dim):
             attempted_row = cur_row + directions[cur_dir][0]
             attempted_col = cur_col + directions[cur_dir][1]
             if (0 <= attempted_row < dim and
-                0 <= attempted_col < dim and 
+                0 <= attempted_col < dim and
                 grid[attempted_row][attempted_col] == 0):
                 cur_row = attempted_row
                 cur_col = attempted_col
