@@ -1,147 +1,147 @@
-"""
-  File: spiral.py
-  Description: Create a table of values starting from 1 in a spiral pattern depending upon
-               the number of rows and columns. Then, taking in the input for a specific
-               value, output the sum of the numbers adjacent to that number.
+#  File: spiral.py
+#  Description:
+#  Student Name: Arun Mahadevan Sathia Narayanan
+#  Student UT EID: as235872
+#  Partner Name: Pranav Belligundu
+#  Partner UT EID: psb898
+#  Course Name: CS 313E
+#  Unique Number: 50184
+#  Date Created: 09/12/2024
+#  Date Last Modified:
 
-  Student Name: Arun Mahadevan Sathia Narayanan
-  Student UT EID: as235872
+# import math
+import sys
 
-  Partner Name: Anirudh Anandula
-  Partner UT EID: ara4275
-
-  Course Name: CS 313E
-  Unique Number: 50184 (Arun)
-  Unique Number: 50183 (Ani)
-  Date Created: 09/03/2024
-  Date Last Modified: 09/03/2024
-
- Input: n is an odd integer between 1 and 100
- Output: returns a 2-D list representing a spiral
-         if n is even add one to n
-
-def create_spiral(n):
-    print("REMOVE THIS PRINT AND ADD YOUR CODE")
-
- Input: spiral is a 2-D list and n is an integer
- Output: returns an integer that is the sum of the
-         numbers adjacent to n in the spiral
-         if n is outside the range return 0
-
-def sum_adjacent_numbers(spiral, n):
-    print("REMOVE THIS PRINT AND ADD YOUR CODE")
-"""
-
-from itertools import count
-from collections import namedtuple
-
-def steps_from_center():
-    """
-    if dim is odd:
-        move right one step
-        move down N steps
-        move left N steps
-    else:
-        move left one step
-        move up N steps
-        move right N steps
-    """
-    Step  = namedtuple("Step", ["dx", "dy"])
-    right_step = Step( 1,  0)
-    down_step  = Step( 0,  1)
-    left_step  = Step(-1,  0)
-    up_step    = Step( 0, -1)
-
-    for n in count(start=1):
-        if n % 2:
-            yield right_step
-            for _ in range(n):
-                yield down_step
-            for _ in range(n):
-                yield left_step
-        else:
-            yield left_step
-            for _ in range(n):
-                yield up_step
-            for _ in range(n):
-                yield right_step
-
-def create_spiral(dim):
-    """Creates a Spiral given a dimension for the spiral dimeter"""
-    if dim % 2 == 0:
-        dim += 1
-    grid = [[""] * dim for _ in range(dim)]
-
-    # and we start by placing a 1 in the center:
-    x = y = int(dim / 2)
-    grid[y][x] = 1
-
-    for i, step in enumerate(steps_from_center(), start=2):
-        if i > dim**2:
-            break
-        x += step.dx
-        y += step.dy
-        grid[y][x] = i
+#THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
+def create_blank_grid(length, width):
+    """HELPER METHOD"""
+    grid = []
+    for i in range(length):
+        grid.append([])
+        for _ in range(width):
+            grid[i].append(0)
 
     return grid
 
+#THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
+def print_grid(grid):
+    """HELPER METHOD"""
+    printed_grid = create_blank_grid(len(grid), len(grid[0]))
+
+    max_length = [-1] * len(grid)
+    length_grid0 = len(grid[0])
+    length_grid = len(grid)
+    for j in range(length_grid0):
+        for i in range(length_grid):
+            printed_grid[i][j] = str(grid[i][j]) + " "
+            if len(printed_grid[i][j]) > max_length[j]:
+                max_length[j] = len(printed_grid[i][j])
+
+    len_printed_grid = len(printed_grid)
+    len_printed_grid0 = len(printed_grid[0])
+    for i in range(len_printed_grid):
+        row = ""
+        for j in range(len_printed_grid0):
+            row += (printed_grid[i][j] + " " * (max_length[j] - len(printed_grid[i][j]) + 1))
+        print(row)
+
+def check_valid_space(row, col, grid):
+    """Checks the valid space"""  
+    length = len(grid)
+    if row < 0 or row > length or col < 0 or col > length:
+        return False
+    return True
+
+def find_fib_number(two_prev, one_prev):
+    """Finds the next Fibonacci number"""
+    return two_prev + one_prev
+
+def create_spiral(dim):
+    """Create Spiral"""
+    grid = create_blank_grid(dim, dim)
+    directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]  # right, down, left, up
+    cur_row = 0
+    cur_col = 0
+    two_prev = 1
+    one_prev = 1  # Start with 1, 1
+    cur_dir = 0
+    reset_start = 2  # The number to start with after reset
+
+    for i in range(dim ** 2):
+        if i == 0 or i == 1:
+            fib_number = 1  # First two numbers are 1
+        else:
+            fib_number = find_fib_number(two_prev, one_prev)
+
+        if fib_number > 100:
+            fib_number = reset_start
+            two_prev = 0
+            one_prev = reset_start  # Reset sequence
+            reset_start += 1  # Increment reset start for next time
+        else:
+            two_prev, one_prev = one_prev, fib_number  # Continue Fibonacci sequence
+
+        grid[cur_row][cur_col] = fib_number
+
+        # Find next valid position
+        for _ in range(4):  # Try all directions
+            attempted_row = cur_row + directions[cur_dir][0]
+            attempted_col = cur_col + directions[cur_dir][1]
+            if (0 <= attempted_row < dim and
+                0 <= attempted_col < dim and
+                grid[attempted_row][attempted_col] == 0):
+                cur_row = attempted_row
+                cur_col = attempted_col
+                break
+            cur_dir = (cur_dir + 1) % 4  # Change direction if current is invalid
+        else:  # If we've tried all directions and found no valid move
+            break
+
+    print_grid(grid)
+    return grid
+
 def sum_sub_grid(grid, val):
-    """
-    Input: grid a 2-D list containing a spiral of numbers
-           val is a number within the range of numbers in
-           the grid
-    Output:
-    sum_sub_grid returns the sum of the numbers (including val)
-    surrounding the parameter val in the grid
-    if val is out of bounds, returns 0
-    """
-    n = len(grid)
-    for r in range(n):
-        for c in range(n):
-            if grid[r][c] == val:
-                total = 0
-                for dr in [-1, 0, 1]:
-                    for dc in [-1, 0, 1]:
-                        if dr == 0 and dc == 0:
-                            continue  # Skip the center cell
-                        nr, nc = r + dr, c + dc
-                        if 0 <= nr < n and 0 <= nc < n:
-                            total += grid[nr][nc]
-                return total
-    return 0  # Return 0 if val is not found in the grid
+    """Sums the 3x3 sub grid centered on the given value"""
+    dim = len(grid)
+
+    # Find the position of the given value
+    center_row = -1
+    center_col = -1
+    for i in range(dim):
+        for j in range(dim):
+            if grid[i][j] == val:
+                center_row = i
+                center_col = j
+                break
+        if center_row != -1:
+            break
+
+    # If the value is not found, return -1
+    if center_row == -1:
+        return -1
+
+    total = 0
+    for i in range(center_row - 1, center_row + 2):
+        for j in range(center_col - 1, center_col + 2):
+            if 0 <= i < dim and 0 <= j < dim:
+                total += grid[i][j]
+
+    return total
 
 def main():
-    """
-    A Main Function to read the data from input,
-    run the program and print to the standard output.
-    """
-
-    # read the dimension of the grid and value from input file
-    #file = open('spiral.in', 'r')
-    dim = int(input())
-
-    # test that dimension is odd
-    if dim % 2 == 0:
-        dim += 1
-
-    # create a 2-D list representing the spiral
-    mat = create_spiral(dim)
-
+    """main with input through terminal"""
     while True:
         try:
-            to_read = input()
-            if to_read != '':
-                sum_val = int(to_read)
-            else:
-                break
-
-            # find sum of adjacent terms
-            adj_sum = sum_sub_grid(mat, sum_val)
-
-            # print the sum
+            input1 = sys.stdin.readline()
+            if input1 != "":
+                dim = int(input1)
+                grid = create_spiral(dim)
+            input2 = sys.stdin.readline()
+            if input2 != "":
+                sum_val = int(input2)
+            adj_sum = sum_sub_grid(grid, sum_val)
             print(adj_sum)
-        except EOFError:
-            return "End of File"
+        except ValueError:
+            continue
 
-if __name__ == "__main__":
-    main()
+main()
