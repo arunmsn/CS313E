@@ -11,35 +11,26 @@
 
 #THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
 def create_blank_grid(length, width):
-    """HELPER METHOD"""
     grid = []
     for i in range(length):
         grid.append([])
-        for _ in range(width):
+        for j in range(width):
             grid[i].append(0)
-
     return grid
 
 #THIS IS JUST A HELPER METHOD NO NEED TO DEBUG
 def print_grid(grid):
-    """HELPER METHOD"""
     printed_grid = create_blank_grid(len(grid), len(grid[0]))
-
-    max_length = [-1] * len(grid)
-    length_grid0 = len(grid[0])
-    length_grid = len(grid)
-    for j in range(length_grid0):
-        for i in range(length_grid):
-            printed_grid[i][j] = str(grid[i][j]) + " "
-            if len(printed_grid[i][j]) > max_length[j]:
-                max_length[j] = len(printed_grid[i][j])
-
-    len_printed_grid = len(printed_grid)
-    len_printed_grid0 = len(printed_grid[0])
-    for i in range(len_printed_grid):
+    maxLength = [-1] * len(grid);
+    for j in range (len(grid[0])):
+        for i in range (len(grid)):
+            printed_grid[i][j] = (str(grid[i][j]) + " ")
+            if len(printed_grid[i][j]) > maxLength[j]:
+                maxLength[j] = len(printed_grid[i][j])
+    for i in range (len(printed_grid)):
         row = ""
-        for j in range(len_printed_grid0):
-            row += (printed_grid[i][j] + " " * (max_length[j] - len(printed_grid[i][j]) + 1))
+        for j in range (len(printed_grid[0])): 
+            row += (printed_grid[i][j] + " " * (maxLength[j] - len(printed_grid[i][j]) + 1))
         print(row)
 
 def check_valid_space(row, col, grid):
@@ -74,10 +65,7 @@ def create_spiral(dim):
             fib_number = reset_start
             two_prev = 0
             one_prev = reset_start  # Reset sequence
-            if reset_start < 99:
-                reset_start += 1  # Increment reset start for next time
-            else:
-                reset_start = 1
+            reset_start += 1  # Increment reset start for next time
         else:
             two_prev, one_prev = one_prev, fib_number  # Continue Fibonacci sequence
 
@@ -133,11 +121,15 @@ def main():
     while True:
         try:
             dim = int(input())
-            grid = create_spiral(dim)
-            sum_val = int(input())
-            adj_sum = sum_sub_grid(grid, sum_val)
-            print(adj_sum)
-
+            if dim < 20:
+                grid = create_spiral(dim)
+                sum_val = int(input())
+                adj_sum = sum_sub_grid(grid, sum_val)
+                print(adj_sum)
+            else:
+                print(-1)
+                sum_val = int(input())
+                print(-1)
         except ValueError:
             print("String Invalid Input")
             continue
