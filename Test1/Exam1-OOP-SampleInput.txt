@@ -1,0 +1,18 @@
+Book, Python Programming, John Doe, 1234567890, 3
+DVD, The Matrix, Wachowskis, 136, 2
+Data Structures, Jane Smith, 0987654321, 1
+list_available_items
+borrow_item: Python Programming
+list_available_items
+borrow_item: Python Programming
+return_item: Python Programming
+list_available_items
+borrow_item: Python Programming
+borrow_item: The Matrix
+borrow_item: Data Structures
+list_available_items
+borrow_item: Python Programming
+return_item: Python Programming
+return_item: The Matrix
+return_item: Data Structures
+list_available_items
