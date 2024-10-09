@@ -17,18 +17,15 @@ def f3(n):
     """third function"""
     return (100 * (n ** 2.1)) + 50
 
+def plot(domain):
+    """plots the functions given a domain max value"""
+    x = np.linspace(0, domain)
+    plt.plot(x, f1(x), label = "f1", color = 'red')
+    plt.plot(x, f2(x), label = "f2", color = 'blue')
+    plt.plot(x, f3(x), label = "f3", color = 'green')
+    plt.legend()
+    plt.show()
 
-x = np.linspace(0, 5)
-plt.plot(x, f1(x), label = "f1", color = 'red')
-plt.show()
-
-x = np.linspace(0, 15)
-plt.plot(x, f2(x), label = "f1", color = 'blue')
-plt.show()
-
-x = np.linspace(0, 50)
-plt.plot(x, f3(x), label = "f1", color = 'green')
-plt.show()
-
-# TASK 2
-# Asymptotic Notation
+plot(5)
+plot(15)
+plot(50)
