@@ -2,88 +2,85 @@
 
 import sys
 
-class Link(object):
+class Link:
     """Link class"""
-    def __init__(self, data, next_link = None):
+    def __init__(self, data):
         self.data = data
+        self.next = None
+
+    def get_data(self):
+        """gets the data"""
+        return self.data
+
+    def set_next(self, next_link):
+        """sets the next link"""
         self.next = next_link
 
-    def print_data(self):
-        """prints the data"""
-        print(self.data)
-
-    def __str__(self):
-        return str(self.data) + "-->" + str(self.next)
-
-class CircularList(object):
+class CircularList:
     """CircularList class"""
     # Constructor
     def __init__(self):
-        self.first = None
+        self.head = None
+
+    def get_head(self):
+        """gets the head of the circular list"""
+        return self.head
 
     # Insert an element (value) in the list
     def insert(self, data):
         """inserts an element in the list"""
         new_link = Link(data)
-        current = self.first
-
-        # if the LL is empty, then the new node itself will be the head/tail of the LL
-        if current is None:
-            self.first = new_link
-            return
-
-        # find the last element of the LL
-        while current.next is not None:
-            current = current.next
-
-        current.next = new_link
+        if not self.head:
+            self.head = new_link
+            new_link.next = self.head
+        else:
+            current = self.head
+            while current.next != self.head:
+                current = current.next
+            current.next = new_link
+            new_link.next = self.head
 
     # Find the link with the given data (value)
     # or return None if the data is not there
     def find(self, data):
         """finds the link with the given data, or None otherwise"""
-        current = self.first
-
-        if current is None:
+        if not self.head:
             return None
-
-        while current.data != data:
-            if current.next is None:
-                return None
-
+        current = self.head
+        while True:
+            if current.data == data:
+                return current
             current = current.next
-
-        nodes_after_current = str(current.next).split("-->")
-        return nodes_after_current[0]
+            if current == self.head:
+                break
+        return None
 
     # Delete a Link with the given data (value) and return the Link
     # or return None if the data is not there
     def delete(self, data):
         """deletes a link with the given data, or None otherwise"""
-        current = self.first
-        previous = self.first
-
-        if current is None:
+        if not self.head:
             return None
-
-        # keep looping until we find data to delete
-        while current.data != data:
-            # verify list is not empty, otherwise return None
-            # also checks every node and ensures nothing is left to point to
-            if current.next is None:
-                return None
-            # updating links in the following steps as we delete a node
-            # assign the current node to the previous node
-            previous = current
-            # previous is the node we want, current would be the next one
+        if self.head.data == data:
+            if self.head.next == self.head:
+                deleted = self.head
+                self.head = None
+                return deleted
+            current = self.head
+            while current.next != self.head:
+                current = current.next
+            deleted = self.head
+            self.head = self.head.next
+            current.next = self.head
+            return deleted
+        current = self.head
+        while current.next != self.head:
+            if current.next.data == data:
+                deleted = current.next
+                current.next = current.next.next
+                return deleted
             current = current.next
-            # updates the current element to be the next one
-        if current == self.first:
-            self.first = current.next
-        else:
-            previous.next = current.next
-
-        return current
+        return None
 
     # Delete the nth Link starting from the Link start
     # Return the data of the deleted Link AND return the
@@ -91,16 +88,35 @@ class CircularList(object):
     def delete_after(self, start, n):
         """deletes the nth link starting from start, 
         then returns the data of the nth link and the next link"""
-        pass
+        if not self.head:
+            return None, None
+        current = start
+        for _ in range(n - 1):
+            current = current.next
+        deleted_data = current.data
+        next_start = current.next
+        self.delete(current.data)
+        return deleted_data, next_start
 
     # Return a string representation of a Ciruclar List
     # The format of the string will be the same as the __str__
     # format for nomal Python lists
     def __str__(self):
-        pass
+        if not self.head:
+            return "[]"
+        result = "["
+        current = self.head
+        while True:
+            result += str(current.data)
+            current = current.next
+            if current == self.head:
+                break
+            result += ", "
+        result += "]"
+        return result
 
 def main():
-    # read number of soldiers
+    """main function"""
     line = sys.stdin.readline()
     line = line.strip()
     num_soldiers = int(line)
@@ -115,7 +131,21 @@ def main():
     line = line.strip()
     elim_num = int(line)
 
-    # your code
+    # Create the circular list
+    circle = CircularList()
+    for i in range(1, num_soldiers + 1):
+        circle.insert(i)
+
+    # Find the starting soldier
+    current = circle.find(start_count)
+
+    # Eliminate soldiers until only one remains
+    while circle.head.next != circle.head:
+        eliminated, current = circle.delete_after(current, elim_num)
+        print(eliminated)
+
+    # Print the last remaining soldier
+    print(circle.head.data)
 
 if __name__ == "__main__":
     main()
