@@ -1,3 +1,5 @@
+"""test_binary_tree.py"""
+
 #  File: TestBinaryTree.py
 #  Description: Program specific aspects of the Binary Tree
 #  Student Name: Arun Mahadevan Sathia Narayanan
@@ -31,12 +33,11 @@ class Node():
         """gets the height"""
         if self.lchild is not None and self.rchild is not None:
             return 1 + max(self.lchild.get_height(), self.rchild.get_height())
-        elif self.lchild is not None:
+        if self.lchild is not None:
             return 1 + self.lchild.get_height()
-        elif self.rchild is not None:
+        if self.rchild is not None:
             return 1 + self.rchild.get_height()
-        else:
-            return 1
+        return 1
 
 class Tree():
     """Tree class"""
@@ -59,25 +60,25 @@ class Tree():
         if self.root is None:
             self.root = new_node
             return
-        else:
-            parent = self.root
-            curr = self.root
-            # finds location to insert new node
-            while curr is not None:
-                parent = curr
-                if data < curr.data:
-                    curr = curr.lchild
-                else:
-                    curr = curr.rchild
-            # inserts new node based on comparision to parent node
-            if data < parent.data:
-                parent.lchild = new_node
+
+        parent = self.root
+        curr = self.root
+        # finds location to insert new node
+        while curr is not None:
+            parent = curr
+            if data < curr.data:
+                curr = curr.lchild
             else:
-                parent.rchild = new_node
-            return
+                curr = curr.rchild
+        # inserts new node based on comparision to parent node
+        if data < parent.data:
+            parent.lchild = new_node
+        else:
+            parent.rchild = new_node
+        return
 
     # Returns the range of values stored in a binary search tree of integers.
-    # The range of values equals the maximum value in the binary search tree minus the minimum value.
+    # The range equals the maximum value in the binary search tree minus the minimum value.
     # If there is one value in the tree the range is 0. If the tree is empty the range is undefined.
     def range(self):
         """gets the range"""
@@ -105,19 +106,66 @@ class Tree():
     # Returns a list of nodes at a given level from left to right
     def get_level(self, level):
         """gets the level"""
-        pass
+        if self.root is None or level < 0:
+            return []
+
+        result = []
+        queue = [(self.root, 0)]
+        while queue:
+            node, curr_level = queue.pop(0)
+
+            # If we reach the desired level, add the node's data
+            if curr_level == level:
+                result.append(node)
+
+            # Only add children to the queue if we haven't reached the desired level
+            if curr_level < level:
+                if node.lchild:
+                    queue.append((node.lchild, curr_level + 1))
+                if node.rchild:
+                    queue.append((node.rchild, curr_level + 1))
+
+        return result
 
     # Returns the list of the node that you see from left side
     # The order of the output should be from top to down
     def left_side_view(self):
         """gets the left side view"""
-        pass
+        result = []
+
+        if self.root is None:
+            return result
+
+        height = self.get_height()
+
+        for level in range(height):
+            level_nodes = self.get_level(level)
+
+            for i, val in enumerate(level_nodes):
+                level_nodes[i] = val.data
+
+            if level_nodes:
+                result.append(level_nodes[0])
+
+        return result
 
     # returns the sum of the value of all leaves.
     # a leaf node does not have any children.
     def sum_leaf_nodes(self):
         """"sum of the leaf nodes"""
-        pass
+        if self.root is None:
+            return 0
+
+        def leaf_sum_helper(node):
+            if node is None:
+                return 0
+
+            if node.lchild is None and node.rchild is None:
+                return node.data
+
+            return leaf_sum_helper(node.lchild) + leaf_sum_helper(node.rchild)
+
+        return leaf_sum_helper(self.root)
 
 def make_tree(data):
     """makes the tree"""
@@ -127,7 +175,7 @@ def make_tree(data):
     return tree
 
 # Develop your own main function or test cases to be able to develop.
-# Our tests on the Gradescop will import your classes and call the methods.
+# Our tests on the Gradescope will import your classes and call the methods.
 
 def main():
     """main method"""
@@ -141,6 +189,9 @@ def main():
 
     print("Tree range is: ",   t1.range())
     print("Tree left side view is: ", t1.left_side_view())
+    print("Level 0: ", t1.get_level(0))
+    print("Level 1: ", t1.get_level(1))
+    print("Level 2: ", t1.get_level(2))
     print("Sum of leaf nodes is: ", t1.sum_leaf_nodes())
     print("##########################")
 
@@ -154,6 +205,9 @@ def main():
 
     print("Tree range is: ",   t2.range())
     print("Tree left side view is: ", t2.left_side_view())
+    print("Level 0: ", t2.get_level(0))
+    print("Level 1: ", t2.get_level(1))
+    print("Level 2: ", t2.get_level(2))
     print("Sum of leaf nodes is: ", t2.sum_leaf_nodes())
     print("##########################")
 
@@ -167,6 +221,9 @@ def main():
 
     print("Tree range is: ",   t3.range())
     print("Tree left side view is: ", t3.left_side_view())
+    print("Level 0: ", t3.get_level(0))
+    print("Level 1: ", t3.get_level(1))
+    print("Level 2: ", t3.get_level(2))
     print("Sum of leaf nodes is: ", t3.sum_leaf_nodes())
     print("##########################")
 
