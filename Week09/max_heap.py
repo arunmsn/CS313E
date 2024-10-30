@@ -8,7 +8,7 @@ class MaxHeap:
         '''
         On this implementation the heap list is initialized with a value
         '''
-        # We do not use the index 0 
+        # We do not use the index 0
         # Index zero is always a very large number as placeholder.
         self.heap_list = [sys.maxsize]
 
@@ -68,7 +68,7 @@ class MaxHeap:
             largest = i
 
         if r <= self.size and self.heap_list[r] > self.heap_list[largest]:
-            largest = r 
+            largest = r
 
         if largest != i :
             self.swap(i, largest)
@@ -87,13 +87,13 @@ class MaxHeap:
     def extract_max(self):
         '''Extracts the max of this heap'''
 
-        # 1. pop the root of the tree which is on the index 1 of the list 
+        # 1. pop the root of the tree which is on the index 1 of the list
         popped = self.heap_list.pop(1)
 
         # 2. Insert the last element of the heap list which is a leaf node and insert it to the root
         if self.size > 1:
             self.insert(self.heap_list.pop())
-        # 3. Call heapify() on the root to fix the error it may have caused. 
+        # 3. Call heapify() on the root to fix the error it may have caused.
             self.max_heapify(1)
 
         return popped
