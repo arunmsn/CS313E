@@ -49,6 +49,15 @@ class Tree():
     # creates the expression tree
     def create_tree (self, expr):
         """creates tree"""
+        elements = expr.split()
+        root = Node()
+        current = root
+        equation = Stack()
+        for token in elements:
+            if token == "(":
+                current.l_child = Node()
+                equation.push(current)
+                current = current.l_child
 
     # this function should evaluate the tree's expression
     # returns the value of the expression after being calculated
