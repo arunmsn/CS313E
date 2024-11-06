@@ -132,7 +132,7 @@ def main():
 # 2. Second test
 # Given an list of integers
 
-    my_heap.build_max_heap([4,12,45,23,11])
+    my_heap.build_max_heap([6, 28, 3, 5, 2, 39, 27, 7, 1, 8, 4])
     print(my_heap)
 
 if __name__ == '__main__':
