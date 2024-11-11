@@ -1,0 +1,232 @@
+# Baseline code for the term project
+"""The code for the ToDo Term Project"""
+
+import os
+from typing import List
+
+class Node:
+    """Defines a node"""
+    def __init__(self, task):
+        self.task = task
+        self.next = None
+
+class LinkedList:
+    """Defines a LinkedList"""
+    def __init__(self):
+        self.head = None
+        self.length = 0
+
+    def insert(self, task):
+        """Inserts a new node"""
+        new_node = Node(task)
+        if self.head is None:
+            self.head = new_node
+        else:
+            new_node.next = self.head
+            self.head = new_node
+        self.length += 1
+
+    def remove(self, index):
+        """Removes a specified node at the index"""
+        if self.head is None:
+            return None
+        if index == 0:
+            removed = self.head
+            self.head = self.head.next
+            self.length -= 1
+            return removed.task
+        current = self.head
+        for _ in range(index - 1):
+            if current.next is None:
+                return None
+            current = current.next
+        if current.next is None:
+            return None
+        removed = current.next
+        current.next = current.next.next
+        self.length -= 1
+        return removed.task
+
+    def get(self, index):
+        """Gets the specific node at the index"""
+        if self.head is None:
+            return None
+        current = self.head
+        for _ in range(index):
+            if current.next is None:
+                return None
+            current = current.next
+        return current.task
+
+    def __len__(self):
+        return self.length
+
+class Task:
+    """Defines a Task"""
+    def __init__(self, title, description, priority):
+        self.title = title
+        self.description = description
+        self.status = "To Do"
+        self.priority = priority
+
+    def __lt__(self, other):
+        return self.priority < other.priority
+
+def heap_push(heap, item):
+    """Adds an item to the heap and then maintains the heap property"""
+    heap.append(item)
+    _heap_up(heap, len(heap) - 1)
+
+def heap_pop(heap):
+    """Removes an item from the heap and then maintains the heap property"""
+    if not heap:
+        return None
+
+    result = heap[0]
+    heap[0] = heap.pop()
+    _heap_down(heap, 0)
+    return result
+
+def _heap_up(heap, index):
+    """Maintains the heap property of the heap, bubbles up items"""
+    parent = (index - 1) // 2
+    if parent >= 0 and heap[parent] > heap[index]:
+        heap[parent], heap[index] = heap[index], heap[parent]
+        _heap_up(heap, parent)
+
+def _heap_down(heap, index):
+    """Maintains the heap property of the heap, bubbles down items"""
+    left = 2 * index + 1
+    right = 2 * index + 2
+    smallest = index
+
+    if left < len(heap) and heap[left] < heap[smallest]:
+        smallest = left
+    if right < len(heap) and heap[right] < heap[smallest]:
+        smallest = right
+
+    if smallest != index:
+        heap[index], heap[smallest] = heap[smallest], heap[index]
+        _heap_down(heap, smallest)
+
+def get_user_input() -> List[str]:
+    """Gets the user input for the Task, Description, and Priority"""
+    title = input("Enter the task title: ")
+    description = input("Enter the task description: ")
+    priority = int(input("Enter the task priority (1 is highest): "))
+    return [title, description, priority]
+
+def load_tasks():
+    """Loads tasks from the file"""
+    stuff = LinkedList()
+    pri_queue = []
+
+    if os.path.exists("todo_list.txt"):
+        with open("todo_list.txt", "r", encoding="utf-8") as file:
+            for line in file:
+                title, description, priority, status = line.strip().split(",")
+                thing = Task(title, description, int(priority))
+                thing.status = status
+                stuff.insert(thing)
+                heap_push(pri_queue, thing)
+
+    return tasks, priority_queue
+
+def save_tasks(stuff: LinkedList):
+    """Saves tasks to the file"""
+    with open("todo_list.txt", "w", encoding="utf-8") as file:
+        for i in range(len(stuff)):
+            task = stuff.get(i)
+            file.write(f"{task.title},{task.description},{task.priority},{task.status}\n")
+
+def add_task():
+    """Adds a Task with a Title, Description, and Priority"""
+    title, description, priority = get_user_input()
+    task = Task(title, description, priority)
+    tasks.insert(task)
+    heap_push(priority_queue, task)
+    save_tasks(tasks)
+    print(f"Added task: {title}")
+
+def update_task():
+    """Updates a Task to a Status"""
+    index = int(input("Enter the index of the task to update: "))
+    status = input("Enter the new status: ")
+    if tasks.get(index-1):
+        task = tasks.get(index-1)
+    else:
+        print("Invalid action.")
+        return
+    task.status = status
+    _heap_down(priority_queue, priority_queue.index(task))
+    save_tasks(tasks)
+    print(f"Updated task: {task.title} - Status: {status}")
+
+def delete_task():
+    """Removes a Task at a specific index"""
+    index = int(input("Enter the index of the task to delete: "))
+    if tasks.get(index-1):
+        task = tasks.remove(index-1)
+    else:
+        print("Invalid action.")
+        return
+    priority_queue.remove(task)
+    save_tasks(tasks)
+    print(f"Deleted task: {task.title}")
+
+def list_tasks():
+    """Prints out the Tasks"""
+    if len(tasks) == 0:
+        print("ToDo list is empty.")
+    else:
+        print("\nTodo List Menu:")
+        print("1. View by Index")
+        print("2. View by Priority")
+        choice = input("Enter your choice (1-2): ")
+
+        if choice == "1":
+            print("Todo List:")
+            for i in range(len(tasks)):
+                task = tasks.get(i)
+                print(f"{i+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+        elif choice == "2":
+            print("Todo List (by Priority):")
+            priority_tasks = sorted(priority_queue, reverse=True)
+            for task in priority_tasks:
+                x = priority_queue.index(task)
+                print(f"{x+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+        else:
+            print("Invalid choice. Please try again.")
+
+def main():
+    """Main method"""
+    global tasks, priority_queue
+    tasks, priority_queue = load_tasks()
+
+    while True:
+        print("\nTodo List Menu:")
+        print("1. Add Task")
+        print("2. Update Task")
+        print("3. Delete Task")
+        print("4. List Tasks")
+        print("5. Exit")
+
+        choice = input("Enter your choice (1-5): ")
+
+        if choice == "1":
+            add_task()
+        elif choice == "2":
+            update_task()
+        elif choice == "3":
+            delete_task()
+        elif choice == "4":
+            list_tasks()
+        elif choice == "5":
+            save_tasks(tasks)
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
