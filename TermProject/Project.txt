@@ -1,0 +1,33 @@
+Define the project idea and create a project model design. You can use any methods to model your software
+model, packages, classes, and communication and interactions between them.
+Describe your project, software model, and its implementation in text form.
+
+You should describe the following items:
+
+**1.  What is your project idea about?**
+My project idea is about a todo list. 
+The todo list will be able to add tasks, update the status of tasks, and delete them once they are done. 
+The tasks will also have a priority established. 
+
+2.  If you use any datasets, describe the dataset and provide how one can access and download it.
+N/A
+
+3.  Describe your design for main packages, classes, methods, functions, and iterations between them.
+
+
+4.  Describe any libraries that you use.
+
+
+5.  Describe the data structures you use.
+Linked Lists
+Trees (Priority Queues, Heaps)
+
+6.  Design some Test cases that can test the correctness of your software.
+
+
+7.  What is your current expectations of your software? 
+    For example, do you expect that it works well? 
+    What are the expected weaknesses?
+
+
+
