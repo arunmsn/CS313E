@@ -1,0 +1,143 @@
+Graph data are present in many applications:
+    Web crawling or web search
+    Social network, friends-of-friend network
+    Computer networks
+    Reference counting in Memory Garbage Collection
+    etc.
+
+A graph structure G = (V,E), with _V vertices_ and _E edges_:
+    V = A Set Vertices (Vertex singular) represented by circles/ovals
+    E = A Set of Edges, each edge is a vertex pair (u,v)
+        Self-loops: edges from a vertex to itself (*no self loop in undirected graphs)
+
+Directed vs Undirected:
+    Directed has edges that are ordered pairs of vertices
+    Undirected has edges that are unordered pairs of vertices
+        (u,v) and (v,u) are considered the same edge
+
+Graphs terminologies:
+    If (u,v) is an edge in a graph, then we say u is an adjacent vertex to v
+    Degree of a vertex:
+        Undirected graph: Number of edges entering a vertex
+        Directed graph: Out-degree (number of edges leaving) + In-degree (number of edges incoming)
+    Path of length k from vertex u to v is the total number of edges to go through from u to reach v
+        EX. 5 -> 3 -> 6 -> 5
+        Path is simple if all vertices in the path are distinct
+        Directed graph: a path <v0, v1, v2, ..., vk> forms a cycle if v0 = vk
+        Undirected graph: a path <v0, v1, v2, ..., vk> forms a cycle if v0 = vk and <v0, v1, v2, ..., vk> are distinct
+
+Representation of Graphs:
+    Adjacency-list:     Consists of array Adj of |V| lists, one for each vertex V. 
+                        Adj[u] consists of all vertices adjacent to u in G.
+                        Required memory space for list is Θ(V+E), which can be stored in a dictionary of list/set values.
+                        Vertex can be a hashable object in python (int, tuple).
+                            We can store multiple graphs on the same vertices set.
+    Adjacency-matrix:   
+                        One disadvantage of the matrix is the larger memory space it requires
+                            With |V| number vertices, it requires Θ(n^2) memory space
+
+Graph Search Problem:
+    Find a path from a start vertex S to a desired destination vertex
+    Visit all vertices or edges of a graph, or visit only a subset that can be reached from start S
+
+Breadth-First Search (BFS):
+    The goal of the BFS is to explore the entire graph level-by-level from a start vertex S
+        Start point is vertex S
+        Start level = {S} initialization of the level set
+        Next find out which other vertices can be reached from the start
+            level_i = {All reachable edges with one step}
+        Build the next level by using all outgoing edges and ignoring the visited vertexes
+
+Algorithm BFS:
+for each vertex u in (G, V) - {s} do
+    u.color = WHITE # default color is WHITE
+    u.d = inf # default distance is infinity
+    u.pi = NIL # default predecessor is nothing
+end for
+s.color = GRAY, s.d = 0, s.pi = NIL
+Q = 0
+ENQUEUE(Q, s)
+while Q != 0 do
+    u = DEQUEUE(Q)
+    for each v in G.Adj[u] do
+        if v.color == WHITE then
+            v.color = GRAY
+            v.d = u.d + 1
+            v.pi = u
+            ENQUEUE(Q, v)
+        end if
+    end for
+    u.color = BLACK
+end while
+# WHITE is undiscovered element
+# GRAY is working element(s)
+# BLACK is finished element
+
+EXAMPLE:
+1 - 2   3
+|   | / |
+4   5 - 6
+
+S = 1
+Distances:
+0 - ∞   ∞
+|   | / |           0 is GRAY, dist = 0
+∞   ∞ - ∞
+[1] # QUEUE
+1 [] # DEQUEUE
+
+Distances:
+0 - 1   ∞
+|   | / |           0 is GRAY, dist = 1, 1's are GRAY
+1   ∞ - ∞
+[] # QUEUE
+[2, 4] # ENQUEUE    0 is now BLACK
+
+Distances:
+0 - 1   ∞
+|   | / |           
+1   ∞ - ∞
+[2, 4] # QUEUE   
+2 [4] # DEQUEUE
+
+Distances:
+0 - 1   ∞
+|   | / |
+1   2 - ∞
+2 [4] # QUEUE
+Visual:
+1 1 2   3
+1   2 ∞ ∞
+4   5 ∞ 6
+[4, 5] # ENQUEUE
+4 [5] # DEQUEUE
+
+[...]
+
+Final
+Distances:
+0 - 1   3
+|   | / |
+1   2 - 3
+Visual:
+1 1 2   3
+1   2 3 X
+4   5 3 6
+We have a X between 3 and 6 because 3 has already been discovered. Final output is this:
+[1] 1 [2]   [3]
+ 1     2  3
+[4]   [5] 3 [6]
+
+EXAMPLE:
+[B]  -  [C]
+   \   / |
+    [A]  |  [G]
+   / |   | /
+[D]  |  [E]
+   \ |   |
+    [F] [H]
+[LOOK AT image.png]
+
+SYMBOLS:
+Θ
+∞
