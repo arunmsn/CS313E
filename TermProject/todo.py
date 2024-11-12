@@ -116,27 +116,27 @@ def get_user_input() -> List[str]:
     priority = int(input("Enter the task priority (1 is highest): "))
     return [title, description, priority]
 
+tasks = LinkedList()
+priority_queue = []
+
 def load_tasks():
     """Loads tasks from the file"""
-    stuff = LinkedList()
-    pri_queue = []
+    global tasks, priority_queue
 
     if os.path.exists("todo_list.txt"):
-        with open("todo_list.txt", "r", encoding="utf-8") as file:
+        with open("todo_list.txt", "r") as file:
             for line in file:
                 title, description, priority, status = line.strip().split(",")
-                thing = Task(title, description, int(priority))
-                thing.status = status
-                stuff.insert(thing)
-                heap_push(pri_queue, thing)
+                task = Task(title, description, int(priority))
+                task.status = status
+                tasks.insert(task)
+                heap_push(priority_queue, task)
 
-    return tasks, priority_queue
-
-def save_tasks(stuff: LinkedList):
+def save_tasks():
     """Saves tasks to the file"""
-    with open("todo_list.txt", "w", encoding="utf-8") as file:
-        for i in range(len(stuff)):
-            task = stuff.get(i)
+    with open("todo_list.txt", "w") as file:
+        for i in range(len(tasks)):
+            task = tasks.get(i)
             file.write(f"{task.title},{task.description},{task.priority},{task.status}\n")
 
 def add_task():
@@ -145,7 +145,7 @@ def add_task():
     task = Task(title, description, priority)
     tasks.insert(task)
     heap_push(priority_queue, task)
-    save_tasks(tasks)
+    save_tasks()
     print(f"Added task: {title}")
 
 def update_task():
@@ -159,7 +159,7 @@ def update_task():
         return
     task.status = status
     _heap_down(priority_queue, priority_queue.index(task))
-    save_tasks(tasks)
+    save_tasks()
     print(f"Updated task: {task.title} - Status: {status}")
 
 def delete_task():
@@ -171,7 +171,7 @@ def delete_task():
         print("Invalid action.")
         return
     priority_queue.remove(task)
-    save_tasks(tasks)
+    save_tasks()
     print(f"Deleted task: {task.title}")
 
 def list_tasks():
@@ -186,22 +186,21 @@ def list_tasks():
 
         if choice == "1":
             print("Todo List:")
-            for i in range(len(tasks)):
+            for i in range(len(tasks)-1, -1, -1):
                 task = tasks.get(i)
-                print(f"{i+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+                print(f"{len(tasks)-i}. {task.title} - Status: {task.status} - Priority: {task.priority}")
         elif choice == "2":
             print("Todo List (by Priority):")
-            priority_tasks = sorted(priority_queue, reverse=True)
+            priority_tasks = sorted(priority_queue)
             for task in priority_tasks:
-                x = priority_queue.index(task)
-                print(f"{x+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+                index = priority_queue.index(task)
+                print(f"{index+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
         else:
             print("Invalid choice. Please try again.")
 
 def main():
     """Main method"""
-    global tasks, priority_queue
-    tasks, priority_queue = load_tasks()
+    load_tasks()
 
     while True:
         print("\nTodo List Menu:")
@@ -222,8 +221,8 @@ def main():
         elif choice == "4":
             list_tasks()
         elif choice == "5":
-            save_tasks(tasks)
-            print("Exiting...")
+            save_tasks()
+            print("ToDo List has been saved. Exiting...")
             break
         else:
             print("Invalid choice. Please try again.")
