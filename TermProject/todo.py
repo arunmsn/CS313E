@@ -17,13 +17,15 @@ class LinkedList:
         self.length = 0
 
     def insert(self, task):
-        """Inserts a new node"""
+        """Inserts a new node at the end of the list"""
         new_node = Node(task)
         if self.head is None:
             self.head = new_node
         else:
-            new_node.next = self.head
-            self.head = new_node
+            current = self.head
+            while current.next is not None:
+                current = current.next
+            current.next = new_node
         self.length += 1
 
     def remove(self, index):
@@ -121,10 +123,8 @@ priority_queue = []
 
 def load_tasks():
     """Loads tasks from the file"""
-    global tasks, priority_queue
-
     if os.path.exists("todo_list.txt"):
-        with open("todo_list.txt", "r") as file:
+        with open("todo_list.txt", "r", encoding="utf-8") as file:
             for line in file:
                 title, description, priority, status = line.strip().split(",")
                 task = Task(title, description, int(priority))
@@ -134,7 +134,7 @@ def load_tasks():
 
 def save_tasks():
     """Saves tasks to the file"""
-    with open("todo_list.txt", "w") as file:
+    with open("todo_list.txt", "w", encoding="utf-8") as file:
         for i in range(len(tasks)):
             task = tasks.get(i)
             file.write(f"{task.title},{task.description},{task.priority},{task.status}\n")
@@ -149,18 +149,44 @@ def add_task():
     print(f"Added task: {title}")
 
 def update_task():
-    """Updates a Task to a Status"""
+    """Updates a Task's Status or Priority"""
+    # Get the task index
     index = int(input("Enter the index of the task to update: "))
-    status = input("Enter the new status: ")
-    if tasks.get(index-1):
-        task = tasks.get(index-1)
-    else:
-        print("Invalid action.")
+
+    # Verify task exists
+    task = tasks.get(index-1)
+    if not task:
+        print("Invalid task index.")
         return
-    task.status = status
-    _heap_down(priority_queue, priority_queue.index(task))
+
+    # Show update options
+    print("\nWhat would you like to update?")
+    print("1. Status")
+    print("2. Priority")
+    update_choice = input("Enter your choice (1-2): ")
+
+    if update_choice == "1":
+        # Update status
+        status = input("Enter the new status: ")
+        task.status = status
+        print(f"Updated task: {task.title} - Status: {status}")
+    elif update_choice == "2":
+        # Update priority
+        try:
+            new_priority = int(input("Enter the new priority (1 is highest): "))
+            # Remove and re-add to priority queue to maintain heap property
+            priority_queue.remove(task)
+            task.priority = new_priority
+            heap_push(priority_queue, task)
+            print(f"Updated task: {task.title} - Priority: {new_priority}")
+        except ValueError:
+            print("Invalid priority value. Please enter a number.")
+            return
+    else:
+        print("Invalid choice.")
+        return
+
     save_tasks()
-    print(f"Updated task: {task.title} - Status: {status}")
 
 def delete_task():
     """Removes a Task at a specific index"""
@@ -186,15 +212,19 @@ def list_tasks():
 
         if choice == "1":
             print("Todo List:")
-            for i in range(len(tasks)-1, -1, -1):
-                task = tasks.get(i)
-                print(f"{len(tasks)-i}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+            task_list = []
+            current = tasks.head
+            while current is not None:
+                task_list.append(current.task)
+                current = current.next
+            for i, task in enumerate(task_list, 1):
+                print(f"{i}. {task.title} - Status: {task.status} - Priority: {task.priority}")
         elif choice == "2":
             print("Todo List (by Priority):")
             priority_tasks = sorted(priority_queue)
             for task in priority_tasks:
-                index = priority_queue.index(task)
-                print(f"{index+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+                x = priority_queue.index(task)
+                print(f"{x+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
         else:
             print("Invalid choice. Please try again.")
 
