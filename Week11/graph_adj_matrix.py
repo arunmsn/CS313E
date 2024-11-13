@@ -1,7 +1,13 @@
+""" 
+Run this python script like this 
+python3  example_009_2_graph_with_adj_matrix.py < graph.txt
+"""
 
 import sys
 
-class Stack ():
+###########################################
+class Stack():
+  """Stack implementation"""
   def __init__ (self):
     self.stack = []
 
@@ -25,8 +31,9 @@ class Stack ():
   def size (self):
     return (len(self.stack))
 
-
+###########################################
 class Queue():
+  """Queue Implementation"""
   def __init__ (self):
     self.queue = []
 
@@ -46,8 +53,9 @@ class Queue():
   def size(self):
     return (len (self.queue))
 
-
+###########################################
 class Vertex():
+  """A single vertex of a Graph."""
   def __init__ (self, label):
     self.label = label
     self.visited = False
@@ -64,114 +72,135 @@ class Vertex():
   def __str__(self):
     return str(self.label)
 
-
+###########################################
 class Graph():
-  def __init__(self):
-    self.Vertices = []
-    self.adjMat = []
+  """A Graph Class G(V, E)"""
 
-  # check if a vertex is already in the graph
+  def __init__(self):
+    """A graph has a list of vertices and a adjacency matrix"""
+    self.vertices = []
+    self.adj_mat = []
+
+  
   def has_vertex(self, label):
-    nVert = len(self.Vertices)
-    for i in range (nVert):
-      if (label == (self.Vertices[i]).get_label()):
+    """Check if a vertex is already in the graph"""
+    for i in range (len(self.vertices)):
+      if label == (self.vertices[i]).get_label():
         return True
     return False
 
-  # given the label get the index of a vertex
+
   def get_index(self, label):
-    nVert = len(self.Vertices)
-    for i in range(nVert):
-      if (label == (self.Vertices[i]).get_label()):
+    """Given the label get the index of a vertex"""
+    for i in range(len(self.vertices)):
+      if label == (self.vertices[i]).get_label():
         return i
     return -1
 
-  # add a Vertex with a given label to the graph
+
   def add_vertex(self, label):
-    if (self.has_vertex(label)):
+    """Add a Vertex with a given label to the graph"""
+    if self.has_vertex(label):
       return
 
     # add vertex to the list of vertices
-    self.Vertices.append(Vertex(label))
+    self.vertices.append(Vertex(label))
 
     # add a new column in the adjacency matrix
-    nVert = len(self.Vertices)
+    nVert = len(self.vertices)
     for i in range(nVert - 1):
-      (self.adjMat[i]).append(0)
+      (self.adj_mat[i]).append(0)
 
     # add a new row for the new vertex
     new_row = []
-    for i in range (nVert):
+    for i in range(nVert):
       new_row.append(0)
-    self.adjMat.append(new_row)
+    self.adj_mat.append(new_row)
 
-  # add weighted directed edge to graph
+  
   def add_directed_edge(self, start, finish, weight = 1):
-    self.adjMat[start][finish] = weight
+    """Add weighted directed edge to graph"""
+    self.adj_mat[start][finish] = weight
 
-  # add weighted undirected edge to graph
   def add_undirected_edge(self, start, finish, weight = 1):
-    self.adjMat[start][finish] = weight
-    self.adjMat[finish][start] = weight
+    """Add weighted undirected edge to graph"""
+    self.adj_mat[start][finish] = weight
+    self.adj_mat[finish][start] = weight
 
-  # return an unvisited vertex adjacent to vertex v (index)
   def get_adj_unvisited_vertex(self, v):
-    nVert = len (self.Vertices)
+    """Return an unvisited vertex adjacent to vertex v (index)"""
+    nVert = len (self.vertices)
     for i in range (nVert):
-      if (self.adjMat[v][i] > 0) and (not (self.Vertices[i]).was_visited()):
+      if (self.adj_mat[v][i] > 0) and (not (self.vertices[i]).was_visited()):
         return i
     return -1
 
 
   def __str__(self):
     '''
-    A simple string representation of the graph in adjacency Matrix. 
+    A simple string representation of the graph in Adjancy Matrix. 
     '''
     tmp = "\nVerticies are: \n"
-    for vertex in self.Vertices:
+    for vertex in self.vertices:
       tmp += str(vertex) + str("\n")
     
-    tmp += "adjacency Matrix is: \n"
-    for i in range(len(self.adjMat)):
+    tmp += "Adjancy Matrix is: \n"
+    for i in range(len(self.adj_mat)):
       tmp +="\n"
-      tmp += str(self.adjMat[i])
+      tmp += str(self.adj_mat[i])
 
     tmp += "\n"
     return tmp
 
-  
+  ###########################################
+
+
   def dfs(self, v):
     '''
     Do a Depth First Search in a given Graph. 
     '''
+
     # create the Stack
     the_stack = Stack()
 
-    # mark the vertex v as visited and push it on the Stack
-    (self.Vertices[v]).visited = True
-
-    print(self.Vertices[v])
+    # mark the starting vertex v as visited and push it on the Stack
+    (self.vertices[v]).visited = True
+    #keep track of visited order by printing
+    print(self.vertices[v])
     
+    #push the start index on stack
     the_stack.push(v)
+    #keep a timer to track the order in which nodes are discovered while visited and a dictionary to hold these values for each node
+    time_counter = 1
+    discover_times = dict()
+    discover_times[v] = time_counter
 
-    # visit all the other vertices according to depth
+
+    # visit all the other vertices according to depth, based on the adj matrix
     while(not the_stack.is_empty()):
       # get an adjacent unvisited vertex
-      u = self.get_adj_unvisited_vertex(the_stack.peek())
-      if (u == -1):
+      u = self.get_adj_unvisited_vertex(the_stack.peek())     
+      time_counter += 1   
+
+      #if there is no adjacent vertex, pop the node
+      if u == -1:
         u = the_stack.pop()
+        time_counter += 1
       else:
-        (self.Vertices[u]).visited = True
-        print (self.Vertices[u])
+        (self.vertices[u]).visited = True
+        print(self.vertices[u]) # output this vertex. 
+        # Add the discovery time for this vertex. 
+        discover_times[u] = time_counter        
         the_stack.push(u)
+    
+    # the stack is empty, let us reset the flags
+    for i in range(len(self.vertices)):
+      (self.vertices[i]).visited = False
+    
+    print(discover_times)
 
-    # the stack is empty, let us rest the flags
-    nVert = len(self.Vertices)
-    for i in range(nVert):
-      (self.Vertices[i]).visited = False
 
-
-
+###########################################
 
   def bfs(self, start):
     '''
@@ -192,15 +221,16 @@ class Graph():
     while not frontier.is_empty():
       s = frontier.dequeue()
       
-      # mark the vertex v as visited and push it on the Stack
-      (self.Vertices[s]).visited = True
-      print(self.Vertices[s])
-
-      next_nodes = [i for i, e in enumerate(self.adjMat[s]) if e != 0]
-
+      # mark the vertex v as visited and print it
+      (self.vertices[s]).visited = True
+      print(self.vertices[s])
+    #This is a list comprehension whihc filters for indices i where it checks the adjacency matrix value is non-zero, looking for an edge.
+      next_nodes = [i for i, e in enumerate(self.adj_mat[s]) if e != 0]
+      
+#The level dictionary keeps track of the distance (level) of each vertex from the start. 
       for vertex in next_nodes:
-        if(not self.Vertices[vertex].visited):
-          (self.Vertices[vertex]).visited = True
+        if not self.vertices[vertex].visited:
+          (self.vertices[vertex]).visited = True
           frontier.enqueue(vertex)
           level[vertex]=level_counter
       
@@ -212,6 +242,7 @@ class Graph():
     
     
 def main():
+  """A main function to create a graph of cities."""
   # create the Graph object
   cities = Graph()
 
@@ -238,7 +269,7 @@ def main():
   print(cities)
 
   # # read each edge and place it in the adjacency matrix
-  for i in range (num_edges):
+  for i in range(num_edges):
     line = sys.stdin.readline()
     edge = line.strip()
     edge = edge.split()
@@ -249,25 +280,25 @@ def main():
     print("Create an edge from " + str(start) + " to " + str(finish) + " with weight of " + str(weight))
 
 
-    cities.add_undirected_edge(start, finish, weight)
+    cities.add_directed_edge(start, finish, weight)
 
-    print(cities)
+  print(cities)
 
-    # read the starting vertex for dfs and bfs
-    line = sys.stdin.readline()
-    start_vertex = line.strip()
+  # read the starting vertex for dfs and bfs
+  line = sys.stdin.readline()
+  start_vertex = line.strip()
 
-    # get the index of the starting vertex
-    start_index = cities.get_index (start_vertex)
+  # get the index of the starting vertex
+  start_index = cities.get_index (start_vertex)
 
-    # do the depth first search
-    print ("Depth First Search")
-    cities.dfs(start_index)
-    print()
+  # do the depth first search
+  print ("Depth First Search")
+  cities.dfs(start_index)
+  print()
 
-    print ("Breath First Search")
-    cities.bfs(start_index)
-    print()
+  print ("Breath First Search")
+  cities.bfs(start_index)
+  print()
 
 if __name__ == "__main__":
-    main()
+  main()
