@@ -208,23 +208,49 @@ def list_tasks():
         print("\nTodo List Menu:")
         print("1. View by Index")
         print("2. View by Priority")
-        choice = input("Enter your choice (1-2): ")
+        print("3. Filter by Status")
+        choice = input("Enter your choice (1-3): ")
+
+        # Create a list of all tasks in their current order
+        task_list = []
+        current = tasks.head
+        while current is not None:
+            task_list.append(current.task)
+            current = current.next
 
         if choice == "1":
             print("Todo List:")
-            task_list = []
-            current = tasks.head
-            while current is not None:
-                task_list.append(current.task)
-                current = current.next
             for i, task in enumerate(task_list, 1):
                 print(f"{i}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+
         elif choice == "2":
             print("Todo List (by Priority):")
             priority_tasks = sorted(priority_queue)
             for task in priority_tasks:
                 x = priority_queue.index(task)
                 print(f"{x+1}. {task.title} - Status: {task.status} - Priority: {task.priority}")
+
+        elif choice == "3":
+            # Get unique statuses from existing tasks
+            statuses = set(task.status for task in task_list)
+            print("\nAvailable statuses:")
+            for status in sorted(statuses):
+                print(f"- {status}")
+
+            # Get status to filter by
+            filter_status = input("\nEnter status to filter by: ")
+
+            # Filter and display tasks
+            filtered_tasks = [task for task in task_list
+                              if task.status.lower() == filter_status.lower()]
+
+            if filtered_tasks:
+                print(f"\nTasks with status '{filter_status}':")
+                for i, task in enumerate(filtered_tasks, 1):
+                    print(f"{i}. {task.title} - Priority: {task.priority}")
+            else:
+                print(f"\nNo tasks found with status '{filter_status}'")
+
         else:
             print("Invalid choice. Please try again.")
 
