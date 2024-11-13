@@ -64,15 +64,25 @@ class LinkedList:
         return self.length
 
 class Task:
-    """Defines a Task"""
+    """Defines a Task with priority validation"""
     def __init__(self, title, description, priority):
         self.title = title
         self.description = description
         self.status = "To Do"
+        # Ensure priority is a positive integer
+        if not isinstance(priority, int) or priority < 1:
+            raise ValueError("Priority must be a positive integer (1 is highest)")
         self.priority = priority
 
     def __lt__(self, other):
+        # Lower number means higher priority
         return self.priority < other.priority
+
+    def __gt__(self, other):
+        return self.priority > other.priority
+
+    def __eq__(self, other):
+        return self.priority == other.priority
 
 def heap_push(heap, item):
     """Adds an item to the heap and then maintains the heap property"""
@@ -84,38 +94,61 @@ def heap_pop(heap):
     if not heap:
         return None
 
+    if len(heap) == 1:
+        return heap.pop()
+
     result = heap[0]
-    heap[0] = heap.pop()
-    _heap_down(heap, 0)
+    heap[0] = heap.pop()  # Move last element to root
+    if heap:  # Only heapify if there are elements remaining
+        _heap_down(heap, 0)
     return result
 
 def _heap_up(heap, index):
     """Maintains the heap property of the heap, bubbles up items"""
-    parent = (index - 1) // 2
-    if parent >= 0 and heap[parent] > heap[index]:
-        heap[parent], heap[index] = heap[index], heap[parent]
-        _heap_up(heap, parent)
+    while index > 0:
+        parent = (index - 1) // 2
+        if heap[parent] > heap[index]:
+            heap[parent], heap[index] = heap[index], heap[parent]
+            index = parent
+        else:
+            break
 
 def _heap_down(heap, index):
     """Maintains the heap property of the heap, bubbles down items"""
-    left = 2 * index + 1
-    right = 2 * index + 2
-    smallest = index
+    if not heap:  # Safety check
+        return
 
-    if left < len(heap) and heap[left] < heap[smallest]:
-        smallest = left
-    if right < len(heap) and heap[right] < heap[smallest]:
-        smallest = right
+    while True:
+        smallest = index
+        left = 2 * index + 1
+        right = 2 * index + 2
 
-    if smallest != index:
+        if left < len(heap) and heap[left] < heap[smallest]:
+            smallest = left
+        if right < len(heap) and heap[right] < heap[smallest]:
+            smallest = right
+
+        if smallest == index:
+            break
+
         heap[index], heap[smallest] = heap[smallest], heap[index]
-        _heap_down(heap, smallest)
+        index = smallest
 
 def get_user_input() -> List[str]:
-    """Gets the user input for the Task, Description, and Priority"""
+    """Gets the user input with priority validation"""
     title = input("Enter the task title: ")
     description = input("Enter the task description: ")
-    priority = int(input("Enter the task priority (1 is highest): "))
+
+    while True:
+        try:
+            priority = int(input("Enter the task priority (1 is highest): "))
+            if priority < 1:
+                print("Priority must be a positive integer (1 is highest)")
+                continue
+            break
+        except ValueError:
+            print("Please enter a valid number")
+
     return [title, description, priority]
 
 tasks = LinkedList()
@@ -151,7 +184,11 @@ def add_task():
 def update_task():
     """Updates a Task's Status or Priority"""
     # Get the task index
-    index = int(input("Enter the index of the task to update: "))
+    try:
+        index = int(input("Enter the index of the task to update: "))
+    except ValueError:
+        print("Please enter a valid number")
+        return
 
     # Verify task exists
     task = tasks.get(index-1)
