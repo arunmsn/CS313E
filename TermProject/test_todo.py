@@ -1,4 +1,14 @@
-"""Test file for todo.py"""
+"""
+  File: test_todo.py
+  Description: Tests the todo.py file.
+
+  Student Name: Arun Mahadevan Sathia Narayanan
+  Student UT EID: as235872
+
+  Course Name: CS 313E
+  Unique Number: 50184
+"""
+
 import unittest
 from todo import LinkedList, Task, heap_push, heap_pop
 

@@ -1,5 +1,15 @@
 # Baseline code for the term project
-"""The code for the ToDo Term Project"""
+"""
+  File: todo.py
+  Description: Creates a todo list that is editable by users 
+               and can be viewed in different methods.
+
+  Student Name: Arun Mahadevan Sathia Narayanan
+  Student UT EID: as235872
+
+  Course Name: CS 313E
+  Unique Number: 50184
+"""
 
 import os
 from typing import List
