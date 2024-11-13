@@ -1,8 +1,14 @@
-Define the project idea and create a project model design. You can use any methods to model your software
-model, packages, classes, and communication and interactions between them.
+Define the project idea and create a project model design. 
+You can use any methods to model your software model, packages, classes, 
+    and communication and interactions between them.
 Describe your project, software model, and its implementation in text form.
 
-You should describe the following items:
+This project is a command line-based To-Do List application that was designed 
+    to help users organize tasks by priority, status, and order. 
+Users can add, update, delete, and list tasks. 
+Every task shall have a title, description, priority, and status. 
+In addition, the application will be able to store tasks persistently and load 
+    them from a file every time the application is used.
 
 1.  What is your project idea about?
 
@@ -18,7 +24,8 @@ This is a ToDo List application that allows users to manage tasks with the follo
 2.  If you use any datasets, describe the dataset and provide how one can access and download it.
 
 No dataset is used, but one is created.
-It creates and maintains its own data in a file called "todo_list.txt", where tasks are stored in a comma-separated format with the structure:
+It creates and maintains its own data in a file called "todo_list.txt", 
+    where tasks are stored in a comma-separated format with the structure:
     title,description,priority,status
 
 
@@ -90,5 +97,3 @@ Expected Weaknesses:
 - No support for task categories or tags
 - No due dates or reminders
 - Basic text-based interface - only Command-Line, not GUI
-
-
