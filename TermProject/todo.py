@@ -84,6 +84,19 @@ class Task:
             raise ValueError("Priority must be a positive integer (1 is highest)")
         self.priority = priority
 
+    # Add comparison methods for priority-based comparison
+    def __lt__(self, other):
+        return self.priority < other.priority
+
+    def __gt__(self, other):
+        return self.priority > other.priority
+
+    def __eq__(self, other):
+        return self.priority == other.priority
+
+    def __str__(self):
+        return f"Task(title={self.title}, priority={self.priority}, status={self.status})"
+
 def heap_push(heap, item):
     """Adds an item to the heap and then maintains the heap property"""
     heap.append(item)
