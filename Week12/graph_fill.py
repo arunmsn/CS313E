@@ -136,7 +136,7 @@ class ColorNode:
         self.edges.append(node_index)
 
     # Input: color is the name of the color the node should be colored in;
-    # the function also saves the previous color 
+    # the function also saves the previous color
     # (might be useful for your flood fill implementation)
     def visit_and_set_color(self, color):
         """visits and sets color"""
@@ -179,8 +179,21 @@ class ImageGraph:
     def print_adjacency_matrix(self):
         """prints the adjacency matrix"""
         print("Adjacency matrix:")
+
+        size = len(self.nodes)
+        matrix = [[0 for _ in range(size)] for _ in range(size)]
+
+        for node in self.nodes:
+            for edge in node.edges:
+                matrix[node.index][edge] = 1
+
+        for row in matrix:
+            row_str = ""
+            for value in row:
+                row_str += str(value) + " "
+            print(row_str.strip())
+
         print()
-        raise NotImplementedError("Remove this exception and print the adjacency matrix here. \n")
 
     # implement your bfs algorithm here. Call print_image() after coloring a node
     # Input: graph is the graph containing the nodes
@@ -194,7 +207,21 @@ class ImageGraph:
         print("Starting BFS; initial state:")
         self.print_image()
 
-        raise NotImplementedError("Remove this exception and implement the bfs algorithm here.")
+        queue = Queue()
+        queue.enqueue(start_index)
+
+        while not queue.is_empty():
+            curr_index = queue.dequeue()
+            curr_node = self.nodes[curr_index]
+
+            if not curr_node.visited:
+                curr_node.visit_and_set_color(color)
+                self.print_image()
+
+                for n_index in curr_node.edges:
+                    if not self.nodes[n_index].visited and \
+                    self.nodes[n_index].color == curr_node.prev_color:
+                        queue.enqueue(n_index)
 
 
     # implement your dfs algorithm here. Call print_image() after coloring a node
@@ -208,9 +235,22 @@ class ImageGraph:
         # print initial state
         print("Starting DFS; initial state:")
         self.print_image()
-        si, c = start_index, color
 
-        raise NotImplementedError("Remove this exception and implement the dfs algorithm here.")
+        stack = Stack()
+        stack.push(start_index)
+
+        while not stack.is_empty():
+            curr_index = stack.pop()
+            curr_node = self.nodes[curr_index]
+
+            if not curr_node.visited:
+                curr_node.visit_and_set_color(color)
+                self.print_image()
+
+                for n_index in curr_node.edges:
+                    if not self.nodes[n_index].visited and \
+                    self.nodes[n_index].color == curr_node.prev_color:
+                        stack.push(n_index)
 
 
 def create_graph(data):
