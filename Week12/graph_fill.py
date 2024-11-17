@@ -51,7 +51,7 @@ def print_block(color):
 # -----------------------PRINTING LOGIC, DON'T WORRY ABOUT THIS PART----------------------------
 
 # Stack class; you can use this for your search algorithms
-class Stack(object):
+class Stack():
     """Stack class"""
     def __init__(self):
         self.stack = []
@@ -82,7 +82,7 @@ class Stack(object):
         return len(self.stack)
 
 # Queue class; you can use this for your search algorithms
-class Queue(object):
+class Queue():
     """Queue class"""
     def __init__(self):
         self.queue = []
@@ -190,8 +190,8 @@ class ImageGraph:
         for row in matrix:
             row_str = ""
             for value in row:
-                row_str += str(value) + " "
-            print(row_str.strip())
+                row_str += str(value)
+            print(row_str)
 
         print()
 
