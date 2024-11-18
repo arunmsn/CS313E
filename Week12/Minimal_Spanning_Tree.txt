@@ -1,0 +1,27 @@
+MST-KRUSKAL(G, w):
+    A = 0
+    for each vertex v in G.V:
+        MAKE-SET(v)
+    create a single list of the edges in G.E
+    sort the list of edges into monotonically increasing order by weight w
+    for each edge (u,v) taken from the sorted list in order:
+        if FIND-SET(u) != FIND-SET(v):
+            A = A U {u,v}
+            UNION(u,v)
+    return A
+
+MST-PRIM(G, w, r):
+    for each vertex u in G.V:
+        u.key = inf
+        u.pi = NIL
+    r.key = 0
+    Q = 0
+    for each vertex u in G.V:
+        INSERT (Q, u)
+    while Q != 0:
+        u = EXTRACT-MIN(Q)                  // add u to the tree
+        for each vertex v in G.adj[u]:      // updates keys of u's non-tree neighbors
+            if v in Q and w(u,v) < v.key:
+                v.pi = u
+                v.key = w(u,v)
+                DECREASE-KEY(Q, v, w,(u,v))
