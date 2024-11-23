@@ -82,7 +82,7 @@ class LinkedList:
 
 class Task:
     """Defines a Task with priority and due date validation"""
-    def __init__(self, title, description, priority, due_date=None):
+    def __init__(self, title, description, priority, due_date=None, allow_past_dates=False):
         self.title = title
         self.description = description
         self.status = "To Do"
@@ -104,6 +104,10 @@ class Task:
             # Ensure due date is a date object
             if not isinstance(due_date, date):
                 raise ValueError("Due date must be a valid date")
+
+            # Validate that due date is not in the past unless explicitly allowed
+            if not allow_past_dates and due_date < date.today():
+                raise ValueError("Due date cannot be in the past")
 
         self.due_date = due_date
 
@@ -206,24 +210,25 @@ def load_tasks():
     """Loads tasks from the file with due date support"""
     if os.path.exists("todo_list.txt"):
         with open("todo_list.txt", "r", encoding="utf-8") as file:
+            # Skip the header line
+            next(file)  # This skips the "Task,Description,Priority,Status,Due Date" line
+
             for line in file:
-                if line == "Task,Description,Priority,Status,Due Date":
-                    continue
-                else:
-                    parts = line.strip().split(",")
-                    if len(parts) == 5:
-                        title, description, priority, status, due_date_str = parts
-                        task = Task(title, description, int(priority),
-                                    due_date_str if due_date_str else None)
-                        task.status = status
-                        tasks.insert(task)
-                        heap_push(priority_queue, task)
-                    elif len(parts) == 4:  # Backwards compatibility
-                        title, description, priority, status = parts
-                        task = Task(title, description, int(priority))
-                        task.status = status
-                        tasks.insert(task)
-                        heap_push(priority_queue, task)
+                parts = line.strip().split(",")
+                if len(parts) == 5:
+                    title, description, priority, status, due_date_str = parts
+                    task = Task(title, description, int(priority),
+                                due_date_str if due_date_str else None, 
+                                allow_past_dates=True)  # Allow past dates when loading from file
+                    task.status = status
+                    tasks.insert(task)
+                    heap_push(priority_queue, task)
+                elif len(parts) == 4:  # Backwards compatibility
+                    title, description, priority, status = parts
+                    task = Task(title, description, int(priority), allow_past_dates=True)
+                    task.status = status
+                    tasks.insert(task)
+                    heap_push(priority_queue, task)
 
 def save_tasks():
     """Saves tasks to the file with due date, preserving the header"""
@@ -373,7 +378,10 @@ def print_task_list(tasks_to_print, header):
     if tasks_to_print:
         print(f"\n{header}:")
         for i, task in enumerate(tasks_to_print, 1):
-            due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else "No due date"
+            if task.due_date:
+                due_date_str = task.due_date.strftime("%Y-%m-%d")
+            else:
+                due_date_str = "No due date"
             print(f"{i}. {task.title} - Status: {task.status} - "
                   f"Priority: {task.priority} - Due: {due_date_str}")
     else:

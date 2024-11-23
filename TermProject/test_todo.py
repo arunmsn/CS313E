@@ -1,161 +1,166 @@
 """
   File: test_todo.py
-  Description: Tests the todo.py file.
+  Description: Test suite for todo.py
+               Tests core functionality, due dates, and time frames
 
   Student Name: Arun Mahadevan Sathia Narayanan
   Student UT EID: as235872
-
+  
   Course Name: CS 313E
   Unique Number: 50184
 """
 
 import unittest
-from todo import LinkedList, Task, heap_push, heap_pop
+from datetime import datetime, date, timedelta
+import os
+from todo import Task, LinkedList, heap_push, heap_pop
+from todo import get_time_frame_tasks, initialize_todo_file
 
-class TestTodo(unittest.TestCase):
-    """test class"""
+class TestTodoList(unittest.TestCase):
     def setUp(self):
+        """Set up test fixtures before each test method"""
+        # Clear any existing todo_list.txt
+        if os.path.exists("todo_list.txt"):
+            os.remove("todo_list.txt")
+        
+        # Initialize empty data structures
         self.tasks = LinkedList()
         self.priority_queue = []
+        
+        # Create some test dates
+        self.today = date.today()
+        self.tomorrow = self.today + timedelta(days=1)
+        self.next_week = self.today + timedelta(weeks=1)
+        self.last_week = self.today - timedelta(weeks=1)
 
     def test_task_creation(self):
-        """Test basic task creation and attributes"""
+        """Test basic task creation and validation"""
+        # Test valid task creation
         task = Task("Test Task", "Description", 1)
         self.assertEqual(task.title, "Test Task")
         self.assertEqual(task.description, "Description")
         self.assertEqual(task.priority, 1)
         self.assertEqual(task.status, "To Do")
+        
+        # Test invalid priority
+        with self.assertRaises(ValueError):
+            Task("Test", "Description", 0)
+        
+        with self.assertRaises(ValueError):
+            Task("Test", "Description", -1)
+
+    def test_task_with_due_date(self):
+        """Test task creation with due dates"""
+        # Test valid future due date
+        future_date = self.today + timedelta(days=5)
+        task = Task("Future Task", "Description", 1, future_date)
+        self.assertEqual(task.due_date, future_date)
+        
+        # Test past due date
+        past_date = self.today - timedelta(days=5)
+        with self.assertRaises(ValueError):
+            Task("Past Task", "Description", 1, past_date)
+        
+        # Test invalid date format
+        with self.assertRaises(ValueError):
+            Task("Invalid Date", "Description", 1, "invalid-date")
 
     def test_linked_list_operations(self):
-        """Test linked list functionality"""
-        # Test insertion
-        task1 = Task("Task 1", "First task", 1)
-        task2 = Task("Task 2", "Second task", 2)
-        self.tasks.insert(task1)
-        self.tasks.insert(task2)
-        self.assertEqual(len(self.tasks), 2)
+        """Test LinkedList operations"""
+        # Test insert
+        self.tasks.insert(Task("Task 1", "Description 1", 1))
+        self.assertEqual(len(self.tasks), 1)
         self.assertEqual(self.tasks.get(0).title, "Task 1")
-
-        # Test removal
+        
+        # Test multiple inserts
+        self.tasks.insert(Task("Task 2", "Description 2", 2))
+        self.assertEqual(len(self.tasks), 2)
+        
+        # Test remove
         removed_task = self.tasks.remove(0)
         self.assertEqual(removed_task.title, "Task 1")
         self.assertEqual(len(self.tasks), 1)
-
-        # Test getting invalid index
-        self.assertIsNone(self.tasks.get(5))
+        
+        # Test get
+        self.assertEqual(self.tasks.get(0).title, "Task 2")
+        self.assertIsNone(self.tasks.get(5))  # Invalid index
 
     def test_priority_queue(self):
         """Test priority queue operations"""
-        # Test priority ordering
-        task1 = Task("High Priority", "Important", 1)
-        task2 = Task("Medium Priority", "Less important", 2)
-        task3 = Task("Low Priority", "Can wait", 3)
-
-        # Test insertion
+        # Create tasks with different priorities
+        task1 = Task("High Priority", "Description", 1)
+        task2 = Task("Medium Priority", "Description", 2)
+        task3 = Task("Low Priority", "Description", 3)
+        
+        # Test heap push
         heap_push(self.priority_queue, task3)
         heap_push(self.priority_queue, task1)
         heap_push(self.priority_queue, task2)
-
-        # Test that tasks come out in priority order
+        
+        # Test heap pop (should come out in priority order)
         self.assertEqual(heap_pop(self.priority_queue).priority, 1)
         self.assertEqual(heap_pop(self.priority_queue).priority, 2)
         self.assertEqual(heap_pop(self.priority_queue).priority, 3)
 
-        # Test empty heap
-        self.assertIsNone(heap_pop(self.priority_queue))
+    def test_time_frame_filtering(self):
+        """Test time frame filtering functionality"""
+        # Create tasks with different due dates
+        task_list = [
+            Task("Today Task", "Description", 1, self.today),
+            Task("Tomorrow Task", "Description", 2, self.tomorrow),
+            Task("Week Task", "Description", 3, self.next_week),
+            Task("Overdue Task", "Description", 4, self.last_week, allow_past_dates=True)
+        ]
+        task_list[3].status = "To Do"  # Ensure overdue task is not marked as done
+        
+        # Test today's tasks
+        today_tasks, _ = get_time_frame_tasks(task_list, "today")
+        self.assertEqual(len(today_tasks), 1)
+        self.assertEqual(today_tasks[0].title, "Today Task")
+        
+        # Test tomorrow's tasks
+        tomorrow_tasks, _ = get_time_frame_tasks(task_list, "tomorrow")
+        self.assertEqual(len(tomorrow_tasks), 1)
+        self.assertEqual(tomorrow_tasks[0].title, "Tomorrow Task")
+        
+        # Test week's tasks
+        week_tasks, _ = get_time_frame_tasks(task_list, "week")
+        self.assertEqual(len(week_tasks), 3)  # Today, Tomorrow, and Week tasks
+        
+        # Test overdue tasks
+        _, overdue_tasks = get_time_frame_tasks(task_list, "overdue")
+        self.assertEqual(len(overdue_tasks), 1)
+        self.assertEqual(overdue_tasks[0].title, "Overdue Task")
 
-        # Test single element
-        heap_push(self.priority_queue, task1)
-        self.assertEqual(heap_pop(self.priority_queue).priority, 1)
-        self.assertIsNone(heap_pop(self.priority_queue))
+    def test_file_operations(self):
+        """Test file operations and header line"""
+        # Test file initialization
+        initialize_todo_file()
+        self.assertTrue(os.path.exists("todo_list.txt"))
+        
+        # Check header line
+        with open("todo_list.txt", "r", encoding="utf-8") as file:
+            first_line = file.readline().strip()
+            self.assertEqual(first_line, "Task,Description,Priority,Status,Due Date")
+        
+        # Clean up
+        os.remove("todo_list.txt")
 
-    def test_task_update(self):
-        """Test task update functionality"""
-        task = Task("Update Test", "Test description", 1)
-        self.tasks.insert(task)
+    def test_task_comparison(self):
+        """Test task comparison operators"""
+        task1 = Task("Task 1", "Description", 1)
+        task2 = Task("Task 2", "Description", 2)
+        task3 = Task("Task 3", "Description", 1)
+        
+        self.assertTrue(task1 < task2)
+        self.assertFalse(task1 > task2)
+        self.assertTrue(task1 == task3)
+        self.assertFalse(task1 == task2)
 
-        # Test status update
-        task.status = "In Progress"
-        self.assertEqual(self.tasks.get(0).status, "In Progress")
+    def tearDown(self):
+        """Clean up after each test method"""
+        if os.path.exists("todo_list.txt"):
+            os.remove("todo_list.txt")
 
-        # Test priority update
-        task.priority = 2
-        self.assertEqual(self.tasks.get(0).priority, 2)
-
-    def test_edge_cases(self):
-        """Test edge cases and error conditions"""
-        # Test empty list operations
-        self.assertIsNone(self.tasks.remove(0))
-        self.assertIsNone(self.tasks.get(0))
-
-        # Test empty priority queue
-        self.assertIsNone(heap_pop(self.priority_queue))
-
-        # Test invalid priority value and expect a ValueError
-        with self.assertRaises(ValueError):
-            Task("Invalid", "Test", -1)
-
-    def test_task_priority_validation(self):
-        """Test task priority validation"""
-        # Test valid priority
-        task = Task("Valid Task", "Description", 1)
-        self.assertEqual(task.priority, 1)
-
-        # Test invalid priorities
-        with self.assertRaises(ValueError):
-            Task("Invalid Task", "Description", 0)
-
-        with self.assertRaises(ValueError):
-            Task("Invalid Task", "Description", -1)
-
-        with self.assertRaises(ValueError):
-            Task("Invalid Task", "Description", "not a number")
-
-    def test_priority_queue_ordering(self):
-        """Test priority queue maintains correct order"""
-        # Create tasks with different priorities
-        task1 = Task("Highest", "Description", 1)
-        task2 = Task("Medium", "Description", 2)
-        task3 = Task("Lowest", "Description", 3)
-
-        # Add tasks in random order
-        heap_push(self.priority_queue, task3)
-        heap_push(self.priority_queue, task1)
-        heap_push(self.priority_queue, task2)
-
-        # Verify they come out in priority order
-        self.assertEqual(heap_pop(self.priority_queue).title, "Highest")
-        self.assertEqual(heap_pop(self.priority_queue).title, "Medium")
-        self.assertEqual(heap_pop(self.priority_queue).title, "Lowest")
-
-    def test_priority_update(self):
-        """Test priority update maintains heap property"""
-        task1 = Task("Task One", "Description", 2)
-        task2 = Task("Task Two", "Description", 3)
-
-        heap_push(self.priority_queue, task1)
-        heap_push(self.priority_queue, task2)
-
-        # Update priority and verify heap property
-        task2.priority = 1
-        # Remove and re-add to maintain heap property
-        self.priority_queue.remove(task2)
-        heap_push(self.priority_queue, task2)
-
-        self.assertEqual(heap_pop(self.priority_queue).title, "Task Two")
-
-    def test_equal_priorities(self):
-        """Test handling of tasks with equal priorities"""
-        task1 = Task("First", "Description", 1)
-        task2 = Task("Second", "Description", 1)
-
-        heap_push(self.priority_queue, task1)
-        heap_push(self.priority_queue, task2)
-
-        # Both tasks should have same priority
-        first = heap_pop(self.priority_queue)
-        second = heap_pop(self.priority_queue)
-        self.assertEqual(first.priority, second.priority)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
