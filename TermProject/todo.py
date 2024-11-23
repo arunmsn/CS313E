@@ -13,7 +13,13 @@
 
 import os
 from typing import List
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
+
+def initialize_todo_file():
+    """Creates the todo list file with headers if it doesn't exist"""
+    if not os.path.exists("todo_list.txt"):
+        with open("todo_list.txt", "w", encoding="utf-8") as file:
+            file.write("Task,Description,Priority,Status,Due Date\n")
 
 class Node:
     """Defines a node"""
@@ -95,12 +101,9 @@ class Task:
                 except ValueError as e:
                     raise ValueError("Invalid date format. Use YYYY-MM-DD") from e
 
-            # Ensure due date is a date object and not in the past
+            # Ensure due date is a date object
             if not isinstance(due_date, date):
                 raise ValueError("Due date must be a valid date")
-
-            if due_date < date.today():
-                raise ValueError("Due date cannot be in the past")
 
         self.due_date = due_date
 
@@ -204,29 +207,36 @@ def load_tasks():
     if os.path.exists("todo_list.txt"):
         with open("todo_list.txt", "r", encoding="utf-8") as file:
             for line in file:
-                parts = line.strip().split(",")
-                if len(parts) == 5:
-                    title, description, priority, status, due_date_str = parts
-                    task = Task(title, description, int(priority),
-                                due_date_str if due_date_str else None)
-                    task.status = status
-                    tasks.insert(task)
-                    heap_push(priority_queue, task)
-                elif len(parts) == 4:  # Backwards compatibility
-                    title, description, priority, status = parts
-                    task = Task(title, description, int(priority))
-                    task.status = status
-                    tasks.insert(task)
-                    heap_push(priority_queue, task)
+                if line == "Task,Description,Priority,Status,Due Date":
+                    continue
+                else:
+                    parts = line.strip().split(",")
+                    if len(parts) == 5:
+                        title, description, priority, status, due_date_str = parts
+                        task = Task(title, description, int(priority),
+                                    due_date_str if due_date_str else None)
+                        task.status = status
+                        tasks.insert(task)
+                        heap_push(priority_queue, task)
+                    elif len(parts) == 4:  # Backwards compatibility
+                        title, description, priority, status = parts
+                        task = Task(title, description, int(priority))
+                        task.status = status
+                        tasks.insert(task)
+                        heap_push(priority_queue, task)
 
 def save_tasks():
-    """Saves tasks to the file with due date"""
+    """Saves tasks to the file with due date, preserving the header"""
     with open("todo_list.txt", "w", encoding="utf-8") as file:
+        # Write the header line first
+        file.write("Task,Description,Priority,Status,Due Date\n")
+        # Write all tasks
         for i in range(len(tasks)):
-            x = tasks.get(i)
+            task = tasks.get(i)
             # Include due date in save format
-            due_date_str = x.due_date.strftime("%Y-%m-%d") if x.due_date else ""
-            file.write(f"{x.title},{x.description},{x.priority},{x.status},{due_date_str}\n")
+            due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else ""
+            file.write(\
+                f"{task.title},{task.description},{task.priority},{task.status},{due_date_str}\n")
 
 def add_task():
     """Adds a Task with a Title, Description, and Priority"""
@@ -280,11 +290,11 @@ def update_task():
 
     elif update_choice == "3":
         # Update due date
-        due_date_input = input("Enter new due date (YYYY-MM-DD) or press Enter to remove due date: ")
+        due_date_inpt = input("Enter new due date (YYYY-MM-DD) or press Enter to remove due date: ")
 
-        if due_date_input:
+        if due_date_inpt:
             try:
-                new_due_date = datetime.strptime(due_date_input, "%Y-%m-%d").date()
+                new_due_date = datetime.strptime(due_date_inpt, "%Y-%m-%d").date()
                 if new_due_date < date.today():
                     print("Due date cannot be in the past")
                     return
@@ -316,8 +326,61 @@ def delete_task():
     save_tasks()
     print(f"Deleted task: {task.title}")
 
+def get_time_frame_tasks(task_list, time_frame):
+    """
+    Filters tasks based on specified time frame
+    Returns tasks that fall within the time frame and overdue tasks
+    """
+    today = date.today()
+
+    # Calculate end dates for different time frames
+    time_frames = {
+        "today": today,
+        "tomorrow": today + timedelta(days=1),
+        "week": today + timedelta(weeks=1),
+        "month": today + timedelta(days=30),
+        "overdue": today
+    }
+
+    if time_frame not in time_frames:
+        return [], []
+
+    end_date = time_frames[time_frame]
+
+    # Filter tasks based on time frame
+    filtered_tasks = []
+    overdue_tasks = []
+
+    for task in task_list:
+        if task.due_date:
+            if time_frame == "overdue":
+                if task.due_date < today and task.status.lower() != "done":
+                    overdue_tasks.append(task)
+            elif time_frame == "today":
+                if task.due_date == today:
+                    filtered_tasks.append(task)
+            elif time_frame == "tomorrow":
+                if task.due_date == end_date:
+                    filtered_tasks.append(task)
+            else:  # week or month
+                if today <= task.due_date <= end_date:
+                    filtered_tasks.append(task)
+
+    return filtered_tasks, overdue_tasks
+
+def print_task_list(tasks_to_print, header):
+    """Helper function to print tasks in a consistent format"""
+    if tasks_to_print:
+        print(f"\n{header}:")
+        for i, task in enumerate(tasks_to_print, 1):
+            due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else "No due date"
+            print(f"{i}. {task.title} - Status: {task.status} - "
+                  f"Priority: {task.priority} - Due: {due_date_str}")
+    else:
+        print(f"\nNo tasks found for {header.lower()}")
+
 def list_tasks():
-    """Prints out the Tasks with due date information"""
+    """Prints out the Tasks with enhanced viewing options"""
     if len(tasks) == 0:
         print("ToDo list is empty.")
     else:
@@ -326,7 +389,8 @@ def list_tasks():
         print("2. View by Priority")
         print("3. Filter by Status")
         print("4. View by Due Date")
-        choice = input("Enter your choice (1-4): ")
+        print("5. View by Time Frame")
+        choice = input("Enter your choice (1-5): ")
 
         # Create a list of all tasks in their current order
         task_list = []
@@ -337,17 +401,21 @@ def list_tasks():
 
         if choice == "1":
             print("Todo List:")
-            for i, x in enumerate(task_list, 1):
-                due_date_str = x.due_date.strftime("%Y-%m-%d") if x.due_date else "No due date"
-                print(f"{i}. {x.title} - Status: {x.status} - Priority: {x.priority} - Due: {due_date_str}")
+            for i, task in enumerate(task_list, 1):
+                due_date_str = task.due_date.strftime("%Y-%m-%d") \
+                    if task.due_date else "No due date"
+                print(f"{i}. {task.title} - Status: {task.status} - "
+                      f"Priority: {task.priority} - Due: {due_date_str}")
 
         elif choice == "2":
             print("Todo List (by Priority):")
             priority_tasks = sorted(priority_queue)
-            for x in priority_tasks:
-                x = priority_queue.index(x)
-                due_date_str = x.due_date.strftime("%Y-%m-%d") if x.due_date else "No due date"
-                print(f"{x+1}. {x.title} - Status: {x.status} - Priority: {x.priority} - Due: {due_date_str}")
+            for task in priority_tasks:
+                x = priority_queue.index(task)
+                due_date_str = task.due_date.strftime("%Y-%m-%d") \
+                    if task.due_date else "No due date"
+                print(f"{x+1}. {task.title} - Status: {task.status} - "
+                      f"Priority: {task.priority} - Due: {due_date_str}")
 
         elif choice == "3":
             # Get unique statuses from existing tasks
@@ -362,22 +430,58 @@ def list_tasks():
             # Filter and display tasks
             filtered_tasks = [task for task in task_list
                               if task.status.lower() == filter_status.lower()]
-
-            if filtered_tasks:
-                print(f"\nTasks with status '{filter_status}':")
-                for i, task in enumerate(filtered_tasks, 1):
-                    due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else "No due date"
-                    print(f"{i}. {task.title} - Priority: {task.priority} - Due: {due_date_str}")
-            else:
-                print(f"\nNo tasks found with status '{filter_status}'")
+            print_task_list(filtered_tasks, f"Tasks with status '{filter_status}'")
 
         elif choice == "4":
             print("Tasks sorted by Due Date:")
             # Sort tasks by due date, with tasks without due dates at the end
-            sorted_tasks = sorted(task_list, key=lambda x: (x.due_date is None, x.due_date or date.max))
-            for i, x in enumerate(sorted_tasks, 1):
-                due_date_str = x.due_date.strftime("%Y-%m-%d") if x.due_date else "No due date"
-                print(f"{i}. {x.title} - Status: {x.status} -  Priority: {x.priority} - Due: {due_date_str}")
+            sorted_tasks = sorted(task_list, key=lambda x: (x.due_date is None,
+                                                            x.due_date or date.max))
+            print_task_list(sorted_tasks, "Tasks by due date")
+
+        elif choice == "5":
+            print("\nTime Frame Options:")
+            print("1. View Overdue Tasks")
+            print("2. View Tasks Due Today")
+            print("3. View Tasks Due Tomorrow")
+            print("4. View Tasks Due in a Week")
+            print("5. View Tasks Due in a Month")
+            print("6. View All Time Frames")
+
+            time_choice = input("Enter your choice (1-6): ")
+
+            time_frames = {
+                "1": "overdue",
+                "2": "today",
+                "3": "tomorrow",
+                "4": "week",
+                "5": "month"
+            }
+
+            if time_choice in time_frames:
+                time_frame = time_frames[time_choice]
+                filtered_tasks, overdue_tasks = get_time_frame_tasks(task_list, time_frame)
+
+                if time_frame == "overdue":
+                    print_task_list(overdue_tasks, "Overdue Tasks")
+                else:
+                    print_task_list(filtered_tasks, f"Tasks due {time_frame}")
+
+            elif time_choice == "6":
+                # Show all time frames
+                for label in ["Overdue Tasks", "Due Today", "Due Tomorrow",
+                            "Due This Week", "Due This Month"]:
+                    time_frame = label.split()[1].lower()
+                    filtered_tasks, overdue_tasks = \
+                        get_time_frame_tasks(task_list, time_frame)
+
+                    if time_frame == "overdue":
+                        print_task_list(overdue_tasks, label)
+                    else:
+                        print_task_list(filtered_tasks, label)
+
+            else:
+                print("Invalid choice. Please try again.")
 
         else:
             print("Invalid choice. Please try again.")
