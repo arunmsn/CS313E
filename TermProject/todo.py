@@ -218,7 +218,7 @@ def load_tasks():
                 if len(parts) == 5:
                     title, description, priority, status, due_date_str = parts
                     task = Task(title, description, int(priority),
-                                due_date_str if due_date_str else None, 
+                                due_date_str if due_date_str else None,
                                 allow_past_dates=True)  # Allow past dates when loading from file
                     task.status = status
                     tasks.insert(task)
@@ -241,7 +241,7 @@ def save_tasks():
             # Include due date in save format
             due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else ""
             file.write(\
-                f"{task.title}, {task.description}, {task.priority}, {task.status}, {due_date_str}\n")
+            f"{task.title}, {task.description}, {task.priority}, {task.status}, {due_date_str}\n")
 
 def add_task():
     """Adds a Task with a Title, Description, and Priority"""
