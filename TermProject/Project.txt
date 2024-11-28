@@ -95,5 +95,4 @@ Strengths:
 
 Expected Weaknesses:
 - No support for task categories or tags
-- No due dates or reminders
 - Basic text-based interface - only Command-Line, not GUI
