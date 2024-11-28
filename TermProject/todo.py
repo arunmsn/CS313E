@@ -19,7 +19,7 @@ def initialize_todo_file():
     """Creates the todo list file with headers if it doesn't exist"""
     if not os.path.exists("todo_list.txt"):
         with open("todo_list.txt", "w", encoding="utf-8") as file:
-            file.write("Task,Description,Priority,Status,Due Date\n")
+            file.write("Task, Description, Priority, Status, Due Date\n")
 
 class Node:
     """Defines a node"""
@@ -214,7 +214,7 @@ def load_tasks():
             next(file)  # This skips the "Task,Description,Priority,Status,Due Date" line
 
             for line in file:
-                parts = line.strip().split(",")
+                parts = line.strip().split(", ")
                 if len(parts) == 5:
                     title, description, priority, status, due_date_str = parts
                     task = Task(title, description, int(priority),
@@ -234,14 +234,14 @@ def save_tasks():
     """Saves tasks to the file with due date, preserving the header"""
     with open("todo_list.txt", "w", encoding="utf-8") as file:
         # Write the header line first
-        file.write("Task,Description,Priority,Status,Due Date\n")
+        file.write("Task, Description, Priority, Status, Due Date\n")
         # Write all tasks
         for i in range(len(tasks)):
             task = tasks.get(i)
             # Include due date in save format
             due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else ""
             file.write(\
-                f"{task.title},{task.description},{task.priority},{task.status},{due_date_str}\n")
+                f"{task.title}, {task.description}, {task.priority}, {task.status}, {due_date_str}\n")
 
 def add_task():
     """Adds a Task with a Title, Description, and Priority"""
