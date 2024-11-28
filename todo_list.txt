@@ -1,1 +1,1 @@
-Task,	Description,	Priority,	Status,	Due Date
+Task, Description, Priority, Status, Due Date

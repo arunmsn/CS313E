@@ -16,7 +16,7 @@ This is a ToDo List application that allows users to manage tasks with the follo
 - Add tasks with title, description, and priority levels
 - Update task status and priority
 - Delete tasks
-- List tasks in different views (by index, priority, or filtered by status)
+- List tasks in different views (by index, priority, filtered by status, due date, or by time frame)
 - Persistent storage using a text file
 - Priority-based task organization
 
@@ -26,7 +26,7 @@ This is a ToDo List application that allows users to manage tasks with the follo
 No dataset is used, but one is created.
 It creates and maintains its own data in a file called "todo_list.txt", 
     where tasks are stored in a comma-separated format with the structure:
-    title,description,priority,status
+    title, description, priority, status,due date
 
 
 3.  Describe your design for main packages, classes, methods, functions, and iterations between them.
@@ -59,12 +59,15 @@ update_task(): Modifies existing tasks
 delete_task(): Removes tasks
 list_tasks(): Displays tasks in various formats
 get_user_input(): Handles user input for task creation
+get_time_frame_tasks(): Shows the tasks within a specified time frame
+print_task_list(): Helper function to print tasks (using a consistent format)
 
 
 4.  Describe any libraries that you use.
 
 os: For file operations (checking file existence, file input/output)
 typing: For type hints (List)
+datetime: For measuring with dates and time frames
 
 
 5.  Describe the data structures you use.
@@ -94,5 +97,5 @@ Strengths:
 - Multiple viewing options
 
 Expected Weaknesses:
-- No support for task categories or tags
+- No support for task categories or tags (only status of task)
 - Basic text-based interface - only Command-Line, not GUI
