@@ -1,0 +1,12 @@
+INITIALIZE SINGLE-SOURCE (G,s)
+for i = 1 to |G.v| - 1:
+    for each edge (u,v) in G.E:
+        RELAX(u,v,w)
+    end for
+end for
+for each edge (u,v) in G.E:
+    if v.d > u.d + w(u,v):
+        return FALSE
+    end if
+end for
+return TRUE

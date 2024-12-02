@@ -1,0 +1,38 @@
+An example of the shortest path would be a drive from point A to point B (e.g. distance between cities)
+The graphs would have weighted edges:
+    Weighted graph G(V,E) with weights on edges W : E --> R
+
+Dijkstra 
+O(Vlog(V)+E)
+
+Bellman Ford 
+O(VE)
+
+V are vertices
+E are edges, DIRECTED (one-way)
+W(A,B) weight of edges from A to B
+
+Path p = <v0, v1, v2, ..., vk>
+(vi, v(i+1)) in E for 0 <= i <= k
+w(p) = sum from (i=0) to (k-1) of w(vi, v(i+1))
+# Weight w(p) of path p is the sum of the weights of its constituent edges
+
+Shortest path referred to as delta (δ)
+Given G(V,E) and starting source vertex S, shortest path is δ(S,V)
+δ(u,v) = { min{w(p): u->v}
+       = { inf
+
+Initial state
+All vertices                    v.d = inf
+                                v.pi = NIL
+Distance to source is zero      s.d = 0
+
+
+RELAXING AN EDGE
+algorithm:
+relax(u,v,w):
+    # vertex u to vertex v with weight w
+    if v.d > u.d + w(u,v) then
+        v.d = u.d + w(u,v)
+        v.pi = u
+    end if

@@ -1,0 +1,10 @@
+INITIALIZE SINGLE-SOURCE (G,s)
+S = 0
+Q = G.V
+while Q != 0:
+    u = EXTRACT_MIN(Q)
+    S = S U {u}
+    for each vertex v in G.Adj[u] do:
+        RELAX(u,v,w)
+    end for
+end while
