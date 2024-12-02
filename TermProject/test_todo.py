@@ -142,7 +142,7 @@ class TestTodoList(unittest.TestCase):
         # Check header line
         with open("todo_list.txt", "r", encoding="utf-8") as file:
             first_line = file.readline().strip()
-            self.assertEqual(first_line, "Task,Description,Priority,Status,Due Date")
+            self.assertEqual(first_line, "Task, Description, Priority, Status, Due Date")
 
         # Clean up
         os.remove("todo_list.txt")
